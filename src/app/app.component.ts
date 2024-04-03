@@ -7,7 +7,8 @@ import { UsuariosService } from './services/usuarios.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, RouterLink, FormsModule, TitleCasePipe],
+  imports: [RouterOutlet, CommonModule, 
+    RouterLink, FormsModule, TitleCasePipe],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

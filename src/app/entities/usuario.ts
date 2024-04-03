@@ -6,6 +6,8 @@ export interface Usuario {
   email: string;
   password: string;
   administrador: boolean;
+  entrenador:boolean;
+  cliente:boolean;
 }
 
 export class UsuarioImpl implements Usuario {
@@ -16,6 +18,8 @@ export class UsuarioImpl implements Usuario {
   email: string;
   password: string;
   administrador: boolean;
+  entrenador:boolean;
+  cliente:boolean;
 
   constructor() {
     this.id = 0;
@@ -25,5 +29,7 @@ export class UsuarioImpl implements Usuario {
     this.email = '';
     this.password = '';
     this.administrador = false;
+    this.entrenador = true;
+    this.cliente = false;
   }
 }

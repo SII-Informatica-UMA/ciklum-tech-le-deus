@@ -30,6 +30,11 @@ export class ListadoUsuarioComponent {
     return this.rol?.rol == Rol.ADMINISTRADOR;
   }
 
+  isEntrenador(): boolean {
+    console.log("Pregunta entrenador: "+this.rol);
+    return this.rol?.rol == Rol.ENTRENADOR;
+  }
+
   ngOnInit(): void {
     this.actualizarUsuarios();
   }
