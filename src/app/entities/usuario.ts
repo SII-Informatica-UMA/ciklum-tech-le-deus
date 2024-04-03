@@ -29,7 +29,7 @@ export class UsuarioImpl implements Usuario {
     this.email = '';
     this.password = '';
     this.administrador = false;
-    this.entrenador = true;
+    this.entrenador = false;
     this.cliente = false;
   }
 }

@@ -1,8 +1,6 @@
-// put-dieta.component.ts
-/*
 import { Component } from '@angular/core';
-import { ClienteService } from './cliente.service';
-import { Dieta } from './dieta.model';
+import { Asignacion } from '../dieta';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-put-dieta',
@@ -10,41 +8,27 @@ import { Dieta } from './dieta.model';
   styleUrls: ['./put-dieta.component.css']
 })
 export class PutDietaComponent {
-  clientes?: Cliente[]; // Array para almacenar clientes del entrenador
-  selectedCliente: any; // Cliente seleccionado por el entrenador
-  dieta: Dieta = new Dieta(); // Modelo para los detalles de la dieta
+  accion: "PUT" | undefined;
+  idCliente?: Number;
+  asignaciones: Asignacion[] = [];
+  errorMessage?: Error;
 
-  constructor(private clienteService: ClienteService) {}
+  constructor(public modal: NgbActiveModal) { }
 
-  ngOnInit() {
-    // Obtener lista de clientes del entrenador
-    this.clienteService.getClientesDelEntrenador().subscribe(
-      (clientes) => {
-        this.clientes = clientes;
-      },
-      (error) => {
-        console.error('Error al obtener clientes:', error);
-      }
-    );
-  }
-
-  onSubmit() {
-    // Verificar que se haya seleccionado un cliente
-    if (!this.selectedCliente) {
-      console.error('Debes seleccionar un cliente');
-      return;
+  asignarCorrector(): void {
+    if (this.idCorrector && this.idExamen) {
+      let asignacion: Asignacion = { idCorrector: this.idCorrector, idExamen: this.idExamen };
+      this.asignaciones.push(asignacion);
+    } else {
+      this.errorMessage = new Error("Campo/s vacío/s");
+      alert(this.errorMessage);
     }
-
-    // Asociar la dieta al cliente seleccionado
-    this.clienteService.asociarDietaACliente(this.selectedCliente.id, this.dieta).subscribe(
-      (response) => {
-        console.log('Dieta asociada correctamente');
-        // Reiniciar formulario o realizar otra acción necesaria
-      },
-      (error) => {
-        console.error('Error al asociar dieta:', error);
-      }
-    );
   }
+
+  guardarAsignaciones(): void {
+    this.modal.close(this.asignaciones);
+  }
+
 }
-*/
+
+
