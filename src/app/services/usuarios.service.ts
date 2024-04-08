@@ -28,7 +28,8 @@ export class UsuariosService {
         apellido2: obj.usuario.apellido2,
         email: obj.usuario.email,
         roles: obj.usuario.administrador?[{rol: Rol.ADMINISTRADOR}]:[],
-        jwt: obj.jwt
+        jwt: obj.jwt,
+        dietas: obj.usuario.dietas
       };
     }));
     return usuarioSesion
@@ -72,6 +73,11 @@ export class UsuariosService {
   getUsuarioSesion(): UsuarioSesion | undefined {
     const usuario = localStorage.getItem('usuario');
     return usuario ? JSON.parse(usuario) : undefined;
+  }
+  //*
+  getUsuarioSesionObservable(): Observable<UsuarioSesion | undefined> {
+    const usuario = localStorage.getItem('usuario');
+    return of(usuario ? JSON.parse(usuario) : undefined);
   }
 
   doLogout() {

@@ -1,0 +1,31 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{accion}} contacto</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cierre usuario')"></button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input class="form-control" id="nombre" [(ngModel)]="dieta.nombre" placeholder="nombre">
+        <label for="apellidos">Apellidos:</label>
+        <input class="form-control" id="descripcion" [(ngModel)]="dieta.descripcion" placeholder="apellidos">
+        <label for="email">E-mail:</label>
+        <input class="form-control" id="observaciones" [(ngModel)]="dieta.observaciones" placeholder="fulanito@mengano.com">
+        <label for="nombre">Nombre:</label>
+        <input class="form-control" id="objetivos" [(ngModel)]="dieta.objetivo" placeholder="nombre">
+        <label for="telefono">Teléfono:</label>
+        <input class="form-control" id="duracionDias" [(ngModel)]="dieta.duracionDias" placeholder="(34) 123456789">
+        <label for="genero">Género:</label>
+        <label for="nombre">Nombre:</label>
+        <input class="form-control" id="alimentos" [(ngModel)]="dieta.alimentos" placeholder="nombre">
+        <label for="nombre">Nombre:</label>
+        <input class="form-control" id="recomendaciones" [(ngModel)]="dieta.recomendaciones" placeholder="nombre">
+        <label for="nombre">Nombre:</label>
+        <input class="form-control" id="id" [(ngModel)]="dieta.id" placeholder="nombre">
+        <label for="nombre">Nombre:</label>
+        <input class="form-control" id="usuarioId" [(ngModel)]="dieta.usuarioId" placeholder="nombre">
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="guardarDieta()">Guardar</button>
+  </div>
+  

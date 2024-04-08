@@ -1,1 +1,21 @@
-<p>dieta-entrenador works!</p>
+<div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <h1>Lista de dietas</h1>
+        <div class="list-group">
+          <button *ngFor="let dieta of dietas"
+            class="list-group-item list-group-item-action"
+            (click)="elegirDieta(dieta)"
+            [class.active]="dieta === dietaElegida">{{dieta.nombre}}</button>
+        </div>
+        <br>
+        <button type="button" class="btn btn-outline-primary bi bi-plus-lg" (click)="aniadirDieta()"></button>
+      </div>
+      <div class="col-md-6" *ngIf="dietaElegida">
+        <app-detalle-dieta [dieta]="dietaElegida"
+            (dietaEliminado)="eliminarDieta($event)"
+            (dietaEditado)="editarDieta($event)"
+        ></app-detalle-dieta>
+      </div>
+    </div>
+  </div>

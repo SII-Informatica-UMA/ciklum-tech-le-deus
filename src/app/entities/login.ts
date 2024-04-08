@@ -1,3 +1,6 @@
+import { Dieta } from './dieta'//LO AÑADO YO
+
+
 
 export interface Login {
   email: string;
@@ -29,6 +32,7 @@ export interface UsuarioSesion {
   email: string;
   jwt: string;
   roles: RolCentro[];
+  dietas : Dieta[]; //LO AÑADO YO
 }
 
 export type MapaCentros = Map<number, string>;

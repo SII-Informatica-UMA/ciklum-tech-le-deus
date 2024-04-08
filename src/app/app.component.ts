@@ -10,14 +10,18 @@ import { NgbNavModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'; //
 import { Rol } from './entities/login'; //entities ya venia creada con el login y usuario
 import { InicioComponent } from './inicio/inicio.component'; //para poder usar la carpeta inicio
 import { DietaSinSesionComponent } from './dieta-sin-sesion/dieta-sin-sesion.component'; //pagina para los usuarios que intenten entrar en dietas sin iniciar sesion
+import { ListadoUsuarioComponent } from './listado-usuario/listado-usuario.component';
+import { LoginComponent } from './login/login.component';
+import { DietaUsuarioComponent } from './dieta-usuario/dieta-usuario.component'
+import { DietaEntrenadorComponent } from './dieta-entrenador/dieta-entrenador.component'
 
 @Component({
   selector: 'app-root',
   standalone: true,
 
   //importamos las cosas que vayamos a usar en app.component.html
-  imports: [RouterOutlet, CommonModule, NgbNavModule, NgbDropdownModule, InicioComponent, DietaSinSesionComponent,
-    RouterLink, FormsModule, TitleCasePipe],
+  imports: [RouterOutlet, CommonModule, NgbNavModule, NgbDropdownModule, InicioComponent, DietaSinSesionComponent, DietaEntrenadorComponent,
+    ListadoUsuarioComponent, LoginComponent, RouterLink, FormsModule, TitleCasePipe, DietaUsuarioComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

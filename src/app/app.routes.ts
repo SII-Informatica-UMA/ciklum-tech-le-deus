@@ -4,7 +4,7 @@ import { ForgottenPasswordComponent } from "./forgotten-password/forgotten-passw
 import { ResetPasswordComponent } from "./reset-password/reset-password.component";
 import { ListadoUsuarioComponent } from "./listado-usuario/listado-usuario.component";
 import { PrincipalComponent } from "./principal/principal.component";
-import { DietaComponent } from "./dieta/dieta.component";
+//import { DietaComponent } from "./dieta/dieta.component";
 
 export const routes: Routes = [
   {
@@ -23,10 +23,10 @@ export const routes: Routes = [
     path: "usuarios",
     component: ListadoUsuarioComponent,
   },
-  {
+  /*{
     path: "dieta",
     component: DietaComponent,
-  },
+  },*/
   {
     path: "",
     component: PrincipalComponent,
