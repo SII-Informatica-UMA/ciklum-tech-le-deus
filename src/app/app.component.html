@@ -1,37 +1,77 @@
-<div class="container">
-  <div class="row">
-    <h3 class="col-6">Gestión de entrenamientos deportivos</h3>
-    <div class="col" *ngIf="usuarioSesion">
-      <p class="align-middle m-1">Bienvenido, {{ usuarioSesion.nombre }}</p>
-    </div>
-    <div class="col-2">
-      <select *ngIf="usuarioSesion" class="form-select" [(ngModel)]="rolIndex">
-        <option
-          *ngFor="let rol of usuarioSesion.roles; let i = index"
-          [value]="i"
-        >
-          {{ rol.rol | titlecase }}
-          {{ rol.nombreCentro ? "en " + rol.nombreCentro : "" }}
-        </option>
-      </select>
-    </div>
-    <div class="col-2 m-1">
-      <a *ngIf="!usuarioSesion" [routerLink]="'/login'"
-        ><button class="btn btn-primary">Iniciar sesión</button></a
-      >
-      <button *ngIf="usuarioSesion" class="btn btn-primary" (click)="logout()">
-        Cerrar sesión
-      </button>
-    </div>
+<div id="main">
+
+  <div class="barraNavegacion">
+
+    <!--este bloque representa la barra de navegacion de la web-->
+    <ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
+
+      <!--boton para la pagina de inicio (por defecto)-->
+      <li [ngbNavItem]="1">
+        <button ngbNavLink (click)="active = 1">Inicio</button>
+        
+      </li>
+
+      <!--Boton para la pagina de dietas-->
+      <li [ngbNavItem]="2">
+        <button ngbNavLink (click)="active = 2">Dietas</button>
+      </li>
+
+      <!--boton para la pagina del recetario-->
+      <li [ngbNavItem]="3">
+        <button ngbNavLink (click)="active = 3">Recetario</button>
+          
+      </li>
+
+      <!--boton para la pagina de administracion-->
+      <li [ngbNavItem]="4">
+        <button ngbNavLink (click)="active = 4">Administracion</button>
+      </li>
+      
+      <!--Boton que se encarga de ver que usuario esta en la sesion-->
+      <li [ngbNavItem]="5">
+        <div ngbDropdown class="d-inline-block">
+          <button type="button" class="btn btn-secondary dropdown-toggle d-flex align-items-center" id="dropdownBasic1" ngbDropdownToggle>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+              <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+            </svg>
+            <div *ngIf="usuarioSesion" class="ml-2">
+              {{usuarioSesion.nombre}}
+            </div>
+            <div *ngIf="!usuarioSesion" class="ml-2">
+              Usuario
+            </div> 
+          </button>
+          
+          <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="log">
+            <a *ngIf="!usuarioSesion" class="btn btn-primary" (click)="mostrarLogin()">Iniciar </a>
+            <button *ngIf="usuarioSesion" class="btn btn-primary" (click)="logout()">Cerrar sesión</button>
+          </div>
+        </div>
+      </li>
+
+    </ul>
+
   </div>
+
+  <div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+  <div class="contenido">
+
+    <!--Nos lleva a la carpeta inicio-->
+    <ng-container *ngIf="active === 1"><app-inicio></app-inicio></ng-container>
+
+    <!--nos lleva a las carpetas: dieta-sin-sesion, dieta-usuario, dieta-entrenador dependiendo de las condiciones-->
+    <ng-container *ngIf="(active === 2 && !usuarioSesion)"><app-dieta-sin-sesion></app-dieta-sin-sesion></ng-container>
+    <!-- COMPLETAR
+    <ng-container *ngIf="(active === 2 && usuarioSesion && !isAdmin())"><app-dieta-usuario></app-dieta-usuario></ng-container>
+    <ng-container *ngIf="(active === 2 && usuarioSesion && isAdmin())"><app-dieta-entrenador></app-dieta-entrenador></ng-container>-->
+    
+    <!--nos lleva a la carpeta recetas-->
+    <ng-container *ngIf="active === 3">Contenido de Recetas</ng-container>
+
+    <!-- COMPLETAR
+    <ng-container *ngIf="active === 4"><app-listado-usuario></app-listado-usuario></ng-container>-->
+  </div>
+
 </div>
-
-<nav class="navbar navbar-expand navbar-light bg-light">
-  <div class="collapse navbar-collapse">
-    <div class="navbar-nav">
-      <a class="nav-item nav-link" [routerLink]="'/'">Home</a>
-    </div>
-  </div>
-</nav>
-
-<router-outlet />
