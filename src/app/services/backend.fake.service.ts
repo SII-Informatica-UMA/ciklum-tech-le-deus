@@ -15,19 +15,29 @@ import { Dieta } from "../entities/dieta";
 const dietasC: Dieta [] = [
 
   {
-    nombre: 'juan',
-    descripcion: 'gfjagfjgf',
-    observaciones: 'añfgnjafja',
-    objetivo: 'fjafaf',
-    duracionDias: 2,
-    alimentos: ['arroz', 'pollo'],
-    recomendaciones: 'comer',
+    nombre: 'Antonio',
+    descripcion: 'Poco calórica',
+    observaciones: 'No superar limite de calorias',
+    objetivo: 'Bajar peso',
+    duracionDias: 30,
+    alimentos: ['verduras', 'arroz'],
+    recomendaciones: 'beber mucha agua',
     id: 1,
     usuarioId: 2,
     creadorId: 1
   },
-
-
+  {
+    nombre: 'Adam',
+    descripcion: 'comer',
+    observaciones: 'no comer frito',
+    objetivo: 'ganar peso',
+    duracionDias: 21,
+    alimentos: ['pavo','pescado', 'pollo'],
+    recomendaciones: 'comer sano',
+    id: 1,
+    usuarioId: 5,
+    creadorId: 2
+  },
 ]
 
 //------------------------------------------------------------------------------------------
@@ -54,6 +64,36 @@ const usuariosC: Usuario [] = [
     password: '5678',
     dietas: [] //LO AÑADO YO
   },
+  {
+    id: 3,
+    nombre: 'Adam',
+    apellido1: 'Ahmed',
+    apellido2: 'Mohamed',
+    email: 'adam@uma.es',
+    administrador: false,
+    password: '1234',
+    dietas:[]
+  },
+  {
+    id: 4,
+    nombre: 'Jaime',
+    apellido1: 'Jimenez',
+    apellido2: 'Santos',
+    email: 'jaime@uma.es',
+    administrador: false,
+    password: '1234',
+    dietas: []
+  },
+  {
+    id: 5,
+    nombre: 'Reda',
+    apellido1: 'Hassoun',
+    apellido2: 'Toujgani',
+    email: 'reda@uma.es',
+    administrador: false,
+    password: '1234',
+    dietas: []
+  }
 ];
 
 @Injectable({

@@ -18,8 +18,11 @@ export class UsuariosService {
 
   doLogin(login: Login): Observable<UsuarioSesion> {
     let jwtObs = this.backend.login(login.email, login.password);
-    let usuarioObs = jwtObs.pipe(concatMap(jwt=>this.backend.getUsuario(this.getUsuarioIdFromJwt(jwt))));
-    let join = forkJoin({jwt: jwtObs, usuario: usuarioObs});
+    
+    let usuarioObs = jwtObs.pipe(concatMap(jwt => this.backend.getUsuario(this.getUsuarioIdFromJwt(jwt))));
+    
+    let join = forkJoin({ jwt: jwtObs, usuario: usuarioObs });
+  
     let usuarioSesion = join.pipe(map(obj => {
       return {
         id: obj.usuario.id,
@@ -27,14 +30,15 @@ export class UsuariosService {
         apellido1: obj.usuario.apellido1,
         apellido2: obj.usuario.apellido2,
         email: obj.usuario.email,
-        roles: obj.usuario.administrador?[{rol: Rol.ADMINISTRADOR}]:[],
+        roles: obj.usuario.administrador ? [{rol: Rol.ADMINISTRADOR}] : [],
         jwt: obj.jwt,
         dietas: obj.usuario.dietas
       };
     }));
-    return usuarioSesion
-    .pipe(concatMap(usuarioSesion=>this.completarConRoles(usuarioSesion)))
-    .pipe(map(usuarioSesion=>{
+  
+    usuarioSesion = usuarioSesion.pipe(concatMap(usuarioSesion => this.completarConRoles(usuarioSesion)));
+  
+    usuarioSesion = usuarioSesion.pipe(map(usuarioSesion => {
       localStorage.setItem('usuario', JSON.stringify(usuarioSesion));
       if (usuarioSesion.roles.length > 0) {
         this.rolCentro = usuarioSesion.roles[0];
@@ -43,13 +47,25 @@ export class UsuariosService {
       }
       return usuarioSesion;
     }));
-
+  
+    return usuarioSesion;
   }
-
+  
+  
   private completarConRoles(usuarioSesion: UsuarioSesion): Observable<UsuarioSesion> {
-    // TODO: acceder a lo sotros servicios (o simular) para completar con los roles necesarios
+    
+    if (usuarioSesion.id === 2 || usuarioSesion.id === 3) {
+
+      usuarioSesion.roles.push({ rol: Rol.ENTRENADOR });
+    } else if (usuarioSesion.id === 4 || usuarioSesion.id === 5) {
+      
+      usuarioSesion.roles.push({ rol: Rol.CLIENTE });
+    }
+   
     return of(usuarioSesion);
   }
+  
+  
 
   private getUsuarioIdFromJwt(jwt: string): number {
     let payload = jose.decodeJwt(jwt);
