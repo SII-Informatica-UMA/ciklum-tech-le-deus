@@ -24,7 +24,7 @@ const dietasC: Dieta [] = [
     recomendaciones: 'beber mucha agua',
     id: 1,
     usuarioId: 2,
-    creadorId: 1
+    creadorId: 2
   },
   {
     nombre: 'Adam',
@@ -104,7 +104,32 @@ export class BackendFakeService {
   private forgottenPasswordTokens;
 
   //lo añado yo
-  private dietas: Dieta[];
+  private dietas: Dieta[]= [
+    {
+      nombre: 'Adam',
+      descripcion: 'volumen',
+      observaciones: '6 dias a la semana',
+      objetivo: 'ganar peso',
+      duracionDias: 25,
+      alimentos: ['arroz', 'pollo'],
+      recomendaciones: 'beber mucha agua',
+      id: 1,
+      usuarioId: 4,
+      creadorId: 2
+    },
+    {
+      nombre: 'Jaime',
+      descripcion: 'baja en caloria',
+      observaciones: '100 g proteinas',
+      objetivo: '2 kilos en un mes',
+      duracionDias: 30,
+      alimentos: ['salchicha', 'pollo'],
+      recomendaciones: 'correr',
+      id: 1,
+      usuarioId: 4,
+      creadorId: 2
+    },
+  ];
 
   constructor() {
     let _usuarios = localStorage.getItem('usuarios');

@@ -1,0 +1,38 @@
+
+.barraNavegacion {
+    display: flex;
+    justify-content: center;
+  }
+  
+.nav-tabs {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+.nav-tabs li {
+    margin: 0 10px;
+  }
+
+.barraNavegacion{
+    background-color: white;
+    position: relative; 
+    z-index: 2;
+}
+
+.barraNavegacion button{
+    color: black;
+}
+
+.barraNavegacion button:focus{
+    color: blue;
+}
+
+.nav-tabs .nav-link.active{
+    background-color: blue(104, 103, 103);
+    color: blue;
+}
+
+.nav-tabs {
+    border-bottom: none;
+    margin-bottom: -6px;
+  }

@@ -92,4 +92,12 @@ export class AppComponent {
   isAdmin() : boolean {
     return this.usuarioService._rolCentro?.rol == Rol.ADMINISTRADOR;
   }
+
+  isEntrenador(): boolean {
+    const usuario = this.usuarioService.getUsuarioSesion();
+    if (usuario) {
+        return usuario.roles.some(rol => rol.rol === Rol.ENTRENADOR);
+    }
+    return false; 
+  }
 }

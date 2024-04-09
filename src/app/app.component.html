@@ -16,12 +16,6 @@
         <button ngbNavLink (click)="active = 2">Dietas</button>
       </li>
 
-      <!--boton para la pagina del recetario
-      <li [ngbNavItem]="3">
-        <button ngbNavLink (click)="active = 3">Recetario</button>
-          
-      </li>-->
-
       <!--boton para la pagina de administracion-->
       <li [ngbNavItem]="4">
         <button ngbNavLink (click)="active = 4">Administracion</button>
@@ -63,13 +57,17 @@
     
     <!--nos lleva a las carpetas: dieta-sin-sesion, dieta-usuario, dieta-entrenador dependiendo de las condiciones-->
     <ng-container *ngIf="(active === 2 && !usuarioSesion)"><app-dieta-sin-sesion></app-dieta-sin-sesion></ng-container>
-    <ng-container *ngIf="(active === 2 && usuarioSesion && !isAdmin())"><app-dieta-usuario></app-dieta-usuario></ng-container>
-    <ng-container *ngIf="(active === 2 && usuarioSesion && isAdmin())"><app-dieta-entrenador></app-dieta-entrenador></ng-container>
     
+<!--    <ng-container *ngIf="(active === 2 && usuarioSesion && !isAdmin())"><app-dieta-usuario></app-dieta-usuario></ng-container>
+    <ng-container *ngIf="(active === 2 && usuarioSesion && isAdmin())"><app-dieta-entrenador></app-dieta-entrenador></ng-container>
+-->
+<ng-container *ngIf="(active === 2 && usuarioSesion && !isEntrenador())"><app-dieta-usuario></app-dieta-usuario></ng-container>
+<ng-container *ngIf="(active === 2 && usuarioSesion && isEntrenador())"><app-dieta-entrenador></app-dieta-entrenador></ng-container>
+<ng-container *ngIf="active === 3"><app-listado-usuario></app-listado-usuario></ng-container>
     <!--nos lleva a la carpeta recetas
     <ng-container *ngIf="active === 3">Contenido de Recetas</ng-container>-->
   
-    <ng-container *ngIf="active === 4"><app-listado-usuario></app-listado-usuario></ng-container>
+<ng-container *ngIf="active === 4"><app-listado-usuario></app-listado-usuario></ng-container> 
   </div>
 
 </div>
