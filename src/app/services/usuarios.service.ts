@@ -65,6 +65,32 @@ export class UsuariosService {
     return of(usuarioSesion);
   }
   
+  getUsuariosConRolCliente(): Observable<Usuario[]> {
+    const usuariosCliente: Usuario[] = [
+      {
+        id: 4,
+        nombre: 'Jaime',
+        apellido1: 'Jimenez',
+        apellido2: 'Santos',
+        email: 'jaime@uma.es',
+        administrador: false,
+        password: '1234',
+        dietas: []
+      },
+      {
+        id: 5,
+        nombre: 'Reda',
+        apellido1: 'Hassoun',
+        apellido2: 'Toujgani',
+        email: 'reda@uma.es',
+        administrador: false,
+        password: '1234',
+        dietas: []
+      }
+    ];
+  
+    return of(usuariosCliente);
+  }
   
 
   private getUsuarioIdFromJwt(jwt: string): number {

@@ -9,16 +9,34 @@ import { FormularioDietaComponent } from '../formulario-dieta/formulario-dieta.c
 import { FormularioUsuarioComponent } from '../formulario-usuario/formulario-usuario.component';
 import { Dieta } from '../entities/dieta';
 import { DetalleDietaComponent } from '../detalle-dieta/detalle-dieta.component';
+import { AppComponent } from '../app.component';
 @Component({
   selector: 'app-dieta-entrenador',
   standalone: true,
-  imports: [CommonModule, DetalleDietaComponent],
+  imports: [CommonModule, DetalleDietaComponent,AppComponent],
   templateUrl: './dieta-entrenador.component.html',
   styleUrl: './dieta-entrenador.component.css'
 })
 export class DietaEntrenadorComponent {
   dietas: Dieta [] = [];
   dietaElegida?: Dieta;
+  
+  isEntrenador(): boolean {
+    const usuario = this.usuarioService.getUsuarioSesion();
+    if (usuario) {
+        return usuario.roles.some(rol => rol.rol === Rol.ENTRENADOR);
+    }
+    return false; 
+  }
+// Verificar si el usuario actual es un cliente
+  isCliente(): boolean {
+    const usuario = this.usuarioService.getUsuarioSesion();
+    if(usuario){
+      return usuario.roles.some(rol => rol.rol === Rol.CLIENTE);
+    }
+    return false; 
+  }
+
   constructor(private dietaService: DietaService, private usuarioService: UsuariosService, private modalService: NgbModal){
       this.ngOnInit();
   }

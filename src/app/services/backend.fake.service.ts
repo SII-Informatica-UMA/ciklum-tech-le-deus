@@ -34,7 +34,7 @@ const dietasC: Dieta [] = [
     duracionDias: 21,
     alimentos: ['pavo','pescado', 'pollo'],
     recomendaciones: 'comer sano',
-    id: 1,
+    id: 2,
     usuarioId: 5,
     creadorId: 2
   },

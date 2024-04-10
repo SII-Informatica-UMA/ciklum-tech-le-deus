@@ -100,4 +100,13 @@ export class AppComponent {
     }
     return false; 
   }
+// Verificar si el usuario actual es un cliente
+  isCliente(): boolean {
+    const usuario = this.usuarioService.getUsuarioSesion();
+    if(usuario){
+      return usuario.roles.some(rol => rol.rol === Rol.CLIENTE);
+    }
+    return false; 
+  }
+ 
 }

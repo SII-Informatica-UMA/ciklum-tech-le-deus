@@ -1,0 +1,11 @@
+h1{
+    text-align: center;
+    
+}
+
+.contorno {
+    text-align: center;
+    background-color: #333; /* Color de fondo del encabezado */
+    color: #fff; /* Color de texto del encabezado */
+    padding: 20px 0;
+}

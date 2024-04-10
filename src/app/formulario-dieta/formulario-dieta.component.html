@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h4 class="modal-title" id="modal-basic-title">{{accion}} contacto</h4>
+  <h4 class="modal-title" id="modal-basic-title">{{accion}} DIETA</h4>
   <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cierre usuario')"></button>
 </div>
 <div class="modal-body">
@@ -18,8 +18,11 @@
       <input class="form-control" id="alimentos" [(ngModel)]="dieta.alimentos" placeholder="arroz, pollo">
       <label for="nombre">Recomendaciones</label>
       <input class="form-control" id="recomendaciones" [(ngModel)]="dieta.recomendaciones" placeholder="recomendaciones">
-      <label for="nombre">Id usuario:</label>
-      <input class="form-control" id="usuarioId" [(ngModel)]="dieta.usuarioId" placeholder="id">
+      <label for="usuarioId">Id usuario:</label>
+      <select class="form-control" id="usuarioId" [(ngModel)]="dieta.usuarioId">
+      <option *ngFor="let usuario of usuariosConRolCliente" [value]="usuario.id">{{ usuario.nombre }}</option>
+      </select>
+
   </div>
 </div>
 <div class="modal-footer">

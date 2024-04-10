@@ -1,7 +1,16 @@
 h2{
     text-align: center;
-    color: blue;
+    color: white;
 
+}
+
+
+.motivacion {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 18px;
+    color: #333; /* Cambia el color del texto según tus preferencias */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Añade un sombreado al texto */
 }
 
 header {
@@ -15,16 +24,7 @@ h1 {
     font-size: 2.5rem; /* Tamaño de fuente del encabezado */
     margin: 0;
 }
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f0f0f0; /* Color de fondo opcional */
-}
+
 
 .carousel-container {
     width: 100%; /* Ajusta el tamaño del contenedor según tus necesidades */

@@ -7,24 +7,24 @@
 
       <!--boton para la pagina de inicio (por defecto)-->
       <li [ngbNavItem]="1">
-        <button ngbNavLink (click)="active = 1">Inicio</button>
+        <button class="btn btn-outline-primary" ngbNavLink (click)="active = 1">Inicio</button>
         
       </li>
 
       <!--Boton para la pagina de dietas-->
       <li [ngbNavItem]="2">
-        <button ngbNavLink (click)="active = 2">Dietas</button>
+        <button class="btn btn-outline-primary" ngbNavLink (click)="active = 2">Dietas</button>
       </li>
 
       <!--boton para la pagina de administracion-->
       <li [ngbNavItem]="4">
-        <button ngbNavLink (click)="active = 4">Administracion</button>
+        <button class="btn btn-outline-primary" ngbNavLink (click)="active = 4">Administracion</button>
       </li>
       
       <!--Boton que se encarga de ver que usuario esta en la sesion-->
       <li [ngbNavItem]="5">
         <div ngbDropdown class="d-inline-block">
-          <button type="button" class="btn btn-secondary dropdown-toggle d-flex align-items-center" id="dropdownBasic1" ngbDropdownToggle>
+          <button type="button" class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" id="dropdownBasic1" ngbDropdownToggle>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
               <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
               <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>

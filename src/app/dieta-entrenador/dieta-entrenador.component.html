@@ -1,7 +1,9 @@
 <div class="container">
     <div class="row">
       <div class="col-md-6">
+        <div class="contorno">
         <h1>Lista de dietas</h1>
+      </div>
         <div class="list-group">
           <button *ngFor="let dieta of dietas"
             class="list-group-item list-group-item-action"
@@ -11,11 +13,14 @@
         <br>
         <button type="button" class="btn btn-outline-primary bi bi-plus-lg" (click)="aniadirDieta()"></button>
       </div>
-      <div class="col-md-6" *ngIf="dietaElegida">
+      <div class="col-md-6" *ngIf="dietaElegida" >
+        <div *ngIf="isEntrenador()">
         <app-detalle-dieta [dieta]="dietaElegida"
             (dietaEliminado)="eliminarDieta($event)"
             (dietaEditado)="editarDieta($event)"
         ></app-detalle-dieta>
+      </div>
+      
       </div>
     </div>
   </div>
