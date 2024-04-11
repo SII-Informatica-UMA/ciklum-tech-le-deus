@@ -16,7 +16,7 @@ export class DetalleDietaComponent {
   @Output() dietaEliminado = new EventEmitter<Dieta>();
   constructor(private usuarioService: UsuariosService, private modalService: NgbModal) {
   }
-  editarDieta(): void {
+  editDieta(): void {
     let ref = this.modalService.open(FormularioDietaComponent);
     ref.componentInstance.accion = "Editar";
     ref.componentInstance.dieta = {...this.dieta};
@@ -24,7 +24,7 @@ export class DetalleDietaComponent {
       this.dietaEditado.emit(dieta);
     });
   }
-  eliminarDieta(): void {
+  deleteDieta(): void {
     this.dietaEliminado.emit(this.dieta);
   }
 }

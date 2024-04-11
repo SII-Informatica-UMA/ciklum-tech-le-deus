@@ -1,26 +1,36 @@
 <div class="container">
+
     <div class="row">
-      <div class="col-md-6">
-        <div class="contorno">
-        <h1>Lista de dietas</h1>
-      </div>
-        <div class="list-group">
-          <button *ngFor="let dieta of dietas"
-            class="list-group-item list-group-item-action"
-            (click)="elegirDieta(dieta)"
-            [class.active]="dieta === dietaElegida">{{dieta.nombre}}</button>
+
+        <div class="col-md-6">
+
+            <div class="contorno">
+              <h1>Lista de dietas</h1>
+          </div>
+
+          <div class="list-group">
+              <button *ngFor="let dieta of dietas"
+                  class="custom-button"
+                  (click)="chooseDieta(dieta)"
+                  [class.active]="dieta === dietaElegida">{{dieta.nombre}}</button>
+          </div>
+          <br>
+          <button type="button" class="custom-button" (click)="addDieta()">Añadir Dieta</button>
+
         </div>
-        <br>
-        <button type="button" class="btn btn-outline-primary bi bi-plus-lg" (click)="aniadirDieta()"></button>
-      </div>
-      <div class="col-md-6" *ngIf="dietaElegida" >
-        <div *ngIf="isEntrenador()">
-        <app-detalle-dieta [dieta]="dietaElegida"
-            (dietaEliminado)="eliminarDieta($event)"
-            (dietaEditado)="editarDieta($event)"
-        ></app-detalle-dieta>
-      </div>
-      
-      </div>
+
+        <div class="col-md-6" *ngIf="dietaElegida">
+
+            <div *ngIf="isTrainer()">
+            <app-detalle-dieta [dieta]="dietaElegida"
+                  (dietaEliminado)="deleteDieta($event)"
+                  (dietaEditado)="editDieta($event)"
+              ></app-detalle-dieta>
+
+            </div>
+
+        </div>
+
     </div>
-  </div>
+
+</div>

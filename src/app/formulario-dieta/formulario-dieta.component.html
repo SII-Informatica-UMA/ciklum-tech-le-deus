@@ -19,12 +19,10 @@
       <label for="nombre">Recomendaciones</label>
       <input class="form-control" id="recomendaciones" [(ngModel)]="dieta.recomendaciones" placeholder="recomendaciones">
       <label for="usuarioId">Id usuario:</label>
-      <select class="form-control" id="usuarioId" [(ngModel)]="dieta.usuarioId">
-      <option *ngFor="let usuario of usuariosConRolCliente" [value]="usuario.id">{{ usuario.nombre }}</option>
-      </select>
+      <input class="form-control" id="usuarioId" [(ngModel)]="dieta.usuarioId" placeholder="id">
 
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-outline-dark" (click)="guardarDieta()">Guardar</button>
+  <button type="button" class="btn btn-outline-dark" (click)="saveDieta()">Guardar</button>
 </div>

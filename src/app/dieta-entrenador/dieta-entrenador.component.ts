@@ -21,14 +21,17 @@ export class DietaEntrenadorComponent {
   dietas: Dieta [] = [];
   dietaElegida?: Dieta;
   
-  isEntrenador(): boolean {
+  //Comprobamos si es entrenador
+  isTrainer(): boolean {
     const usuario = this.usuarioService.getUsuarioSesion();
     if (usuario) {
         return usuario.roles.some(rol => rol.rol === Rol.ENTRENADOR);
     }
     return false; 
   }
-// Verificar si el usuario actual es un cliente
+
+
+// Comprobamos si el usuario actual es un cliente
   isCliente(): boolean {
     const usuario = this.usuarioService.getUsuarioSesion();
     if(usuario){
@@ -40,14 +43,6 @@ export class DietaEntrenadorComponent {
   constructor(private dietaService: DietaService, private usuarioService: UsuariosService, private modalService: NgbModal){
       this.ngOnInit();
   }
-
-  /*
-   ngOnInit(): void {
-    this.dietaService.getDietas().subscribe(dietas => {
-      this.dietas = dietas;
-    });
-  }
-  */
 
   ngOnInit(): void {
     this.usuarioService.getUsuarioSesionObservable().subscribe(usuarioSesion => {
@@ -64,11 +59,11 @@ export class DietaEntrenadorComponent {
   
 
 
-  elegirDieta(dieta: Dieta): void {
+  chooseDieta(dieta: Dieta): void {
     this.dietaElegida = dieta;
   }
 
-  aniadirDieta(): void {
+  addDieta(): void {
     let ref = this.modalService.open(FormularioDietaComponent);
     ref.componentInstance.accion = "Añadir";
     ref.componentInstance.contacto = { nombre: '', descripcion: '', observaciones:'', objetivo:'', duracionDias: 0, 
@@ -79,13 +74,14 @@ export class DietaEntrenadorComponent {
     }, (reason) => {}) 
   }
 
-  eliminarDieta(dieta: Dieta): void {
+  deleteDieta(dieta: Dieta): void {
     this.dietaService.eliminarDieta(dieta, dieta.usuarioId);
     this.ngOnInit();
 
     this.dietaElegida  = undefined;
   }
-  editarDieta(dieta: Dieta): void {
+
+  editDieta(dieta: Dieta): void {
     this.dietaService.editarDieta(dieta, dieta.usuarioId);
     this.ngOnInit();
     

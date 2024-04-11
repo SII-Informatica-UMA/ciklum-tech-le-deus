@@ -187,13 +187,13 @@ export class BackendFakeService {
     }
     this.dietas[i] = dieta;
   
-    // Encuentra el usuario
+   
     let usuario = this.usuarios.find(u => u.id == usuarioId);
     if (usuario) {
-      // Encuentra la dieta en la lista de dietas del usuario
+     
       let indexDietaUsuario = usuario.dietas.findIndex(d => d.id == dieta.id);
       if (indexDietaUsuario !== -1) {
-        // Actualiza la dieta en la lista de dietas del usuario
+       
         usuario.dietas[indexDietaUsuario] = dieta;
       }
     }
@@ -226,13 +226,12 @@ export class BackendFakeService {
       });
     }
 
-    dieta.id = this.dietas.length + 1; // Asignar un ID único a la nueva dieta
-    dieta.usuarioId = usuarioId; // Asignar el ID del usuario a la dieta
-
-    this.dietas.push(dieta); // Agregar la nueva dieta al arreglo de dietas
+    dieta.id = this.dietas.length + 1; 
+    dieta.usuarioId = usuarioId; 
+    this.dietas.push(dieta); 
     usuario.dietas.push(dieta);
-    this.guardarDietasEnLocalStorage(); // Guardar las dietas en el almacenamiento local
-    return of(dieta); // Devolver la nueva dieta creada
+    this.guardarDietasEnLocalStorage(); 
+    return of(dieta); 
   }
   private guardarDietasEnLocalStorage(): void {
     localStorage.setItem('dietas', JSON.stringify(this.dietas));

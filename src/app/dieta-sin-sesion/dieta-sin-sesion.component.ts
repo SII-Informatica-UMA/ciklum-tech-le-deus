@@ -20,7 +20,7 @@ export class DietaSinSesionComponent {
   }
 
   //lo he añadido yo
-  get usuarioSesion() {
+  get sesionIniciada() {
     return this.usuarioService.getUsuarioSesion();
   }
 

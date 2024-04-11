@@ -61,13 +61,13 @@
 <!--    <ng-container *ngIf="(active === 2 && usuarioSesion && !isAdmin())"><app-dieta-usuario></app-dieta-usuario></ng-container>
     <ng-container *ngIf="(active === 2 && usuarioSesion && isAdmin())"><app-dieta-entrenador></app-dieta-entrenador></ng-container>
 -->
-<ng-container *ngIf="(active === 2 && usuarioSesion && !isEntrenador())"><app-dieta-usuario></app-dieta-usuario></ng-container>
-<ng-container *ngIf="(active === 2 && usuarioSesion && isEntrenador())"><app-dieta-entrenador></app-dieta-entrenador></ng-container>
-<ng-container *ngIf="active === 3"><app-listado-usuario></app-listado-usuario></ng-container>
-    <!--nos lleva a la carpeta recetas
-    <ng-container *ngIf="active === 3">Contenido de Recetas</ng-container>-->
-  
-<ng-container *ngIf="active === 4"><app-listado-usuario></app-listado-usuario></ng-container> 
+    <ng-container *ngIf="(active === 2 && usuarioSesion && !isEntrenador())"><app-dieta-usuario></app-dieta-usuario></ng-container>
+    <ng-container *ngIf="(active === 2 && usuarioSesion && isEntrenador())"><app-dieta-entrenador></app-dieta-entrenador></ng-container>
+    <ng-container *ngIf="active === 3"><app-listado-usuario></app-listado-usuario></ng-container>
+        <!--nos lleva a la carpeta recetas
+        <ng-container *ngIf="active === 3">Contenido de Recetas</ng-container>-->
+      
+    <ng-container *ngIf="active === 4"><app-listado-usuario></app-listado-usuario></ng-container> 
   </div>
 
 </div>

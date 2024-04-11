@@ -9,7 +9,7 @@ import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
   selector: 'app-inicio',
   standalone: true,
   imports: [NgbCarouselModule], //lo he importado yo, lo demas ya venia
-  templateUrl: './inicio.component.html',
+  templateUrl: 'inicio.component.html',
   styleUrl: './inicio.component.css'
 })
 export class InicioComponent {

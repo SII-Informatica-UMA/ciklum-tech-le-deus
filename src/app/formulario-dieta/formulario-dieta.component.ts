@@ -14,25 +14,16 @@ import { Usuario } from '../entities/usuario';
 export class FormularioDietaComponent {
   constructor(public modal: NgbActiveModal, private ususarioService: UsuariosService) {}
   
-  usuariosConRolCliente: Usuario[] = [];
+  
   accion?: "Añadir" | "Editar";
   dieta : Dieta = { nombre: '', descripcion: '', observaciones:'', objetivo:'', duracionDias: 0, 
     alimentos: [], recomendaciones:'', id: 0, usuarioId:0, creadorId:this.ususarioService.getUsuarioSesion()?.id }
   
   
     ngOnInit(): void {
-      this.ususarioService.getUsuariosConRolCliente().subscribe(
-        usuarios => {
-          this.usuariosConRolCliente = usuarios;
-          console.log('Usuarios con rol cliente:', this.usuariosConRolCliente); // Comprueba los usuarios obtenidos en la consola
-        },
-        error => {
-          console.error('Error al obtener usuarios con rol cliente:', error); // Manejo de errores
-        }
-      );
     }
 
-  guardarDieta(): void {
+  saveDieta(): void {
     this.modal.close(this.dieta);
   }
 
