@@ -1,17 +1,18 @@
 package ciklumtechledeus.entidades.entities;
 
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 import java.util.List;
 import java.util.Objects;
 
 @Entity
-public class Cliente {
+public class Entrenador {
     
     @Id
     @GeneratedValue
@@ -24,16 +25,15 @@ public class Cliente {
 
     @ManyToMany
     private List<Dieta> dietas;
-    
-    @ManyToOne
-    private Entrenador entrenador;
+    @OneToMany(mappedBy = "entrenador", cascade = CascadeType.ALL)
+    private List<Cliente> clientes;
 
     // Constructor vacío necesario para JPA
-    public Cliente() {
+    public Entrenador() {
     }
 
     // Constructor con todos los campos
-    public Cliente(int id, String nombre, String apellido1, String apellido2, String email,String password,List<Dieta> dietas){
+    public Entrenador(int id, String nombre, String apellido1, String apellido2, String email,String password,List<Dieta> dietas){
         this.id = id;
         this.nombre = nombre;
         this.apellido1 = apellido1;
@@ -106,8 +106,8 @@ public class Cliente {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Cliente cliente = (Cliente) o;
-        return Objects.equals(id, cliente.id); 
+        Entrenador trainer = (Entrenador) o;
+        return Objects.equals(id, trainer.id); 
     }
 
     @Override
@@ -117,7 +117,7 @@ public class Cliente {
 
     @Override
     public String toString() {
-        return "Cliente{" +
+        return "Entrenador{" +
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
                 ", apellido1='" + apellido1 + '\'' +
