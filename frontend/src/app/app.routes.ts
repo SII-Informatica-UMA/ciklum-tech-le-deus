@@ -7,7 +7,7 @@ import { PrincipalComponent } from "./principal/principal.component";
 //import { DietaComponent } from "./dieta/dieta.component";
 
 export const routes: Routes = [
-  {
+ /* {
     path: "login",
     component: LoginComponent,
   },
@@ -23,12 +23,10 @@ export const routes: Routes = [
     path: "usuarios",
     component: ListadoUsuarioComponent,
   },
-  /*{
-    path: "dieta",
-    component: DietaComponent,
-  },*/
+  
   {
     path: "",
     component: PrincipalComponent,
   },
+  */
 ];

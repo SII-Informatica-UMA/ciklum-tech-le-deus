@@ -187,7 +187,7 @@ export class BackendFakeService {
     }
     this.dietas[i] = dieta;
   
-   
+   /*
     let usuario = this.usuarios.find(u => u.id == usuarioId);
     if (usuario) {
      
@@ -196,10 +196,10 @@ export class BackendFakeService {
        
         usuario.dietas[indexDietaUsuario] = dieta;
       }
-    }
+    }*/
   
     this.guardarDietasEnLocalStorage();
-    this.guardarUsuariosEnLocalStorage();
+   // this.guardarUsuariosEnLocalStorage();
     return of(dieta);
   }
   getDietas(): Observable<Dieta[]> {

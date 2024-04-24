@@ -18,7 +18,6 @@ import { DietaEntrenadorComponent } from './dieta-entrenador/dieta-entrenador.co
 @Component({
   selector: 'app-root',
   standalone: true,
-
   //importamos las cosas que vayamos a usar en app.component.html
   imports: [RouterOutlet, CommonModule, NgbNavModule, NgbDropdownModule, InicioComponent, DietaSinSesionComponent, DietaEntrenadorComponent,
     ListadoUsuarioComponent, LoginComponent, RouterLink, FormsModule, TitleCasePipe, DietaUsuarioComponent],
