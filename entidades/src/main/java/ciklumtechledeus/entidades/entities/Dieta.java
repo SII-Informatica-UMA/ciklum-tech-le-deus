@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity 
 public class Dieta{
@@ -19,10 +20,12 @@ public class Dieta{
     private String recomendaciones;
     @Id
     @GeneratedValue
-    private int id;
-    private int usuarioId;
-    private int creadorId;
+    private Long id;
+    private Set<Long> IdCliente;
+    @ElementCollection
+    private Long IdEntrenador;
 
+    /*
     //Definimos constructor
     public Dieta(String nombre, String descripcion, String observaciones, String objetivo, int durDias, ArrayList<String> alimentos, String recomendaciones, int id, int usuarioId, int creadorId) {
         this.nombre = nombre;
@@ -35,9 +38,10 @@ public class Dieta{
         this.id = id;
         this.usuarioId = usuarioId;
         this.creadorId = creadorId;     
-    }
+    }*/
 
-    //Getters
+    //Getters y Setters 
+    
     public String getNombre(){
         return nombre;
     }
@@ -66,19 +70,18 @@ public class Dieta{
         return recomendaciones;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public int getUsuarioId() {
-        return usuarioId;
+    public Set<Long> getCliente() {
+        return IdCliente;
     }
 
-    public int getCreadorId() {
-        return creadorId;
+    public Long getEntrenadorId() {
+        return IdEntrenador;
     }
 
-    //Setters
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
@@ -107,12 +110,12 @@ public class Dieta{
         this.recomendaciones = recomendaciones;
     }
 
-    public void setUsuarioId(int usuarioId) {
-        this.usuarioId = usuarioId;
+    public void setCliente(Set<Long> IdCliente) {
+        this.IdCliente = IdCliente;
     }
 
-    public void setCreadorId(int creadorId) {
-        this.creadorId = creadorId;
+    public void setEntrenador(Long IdEntrenador) {
+        this.IdEntrenador = IdEntrenador;
     }
 
     @Override
@@ -130,14 +133,14 @@ public class Dieta{
     @Override
     public int hashCode(){
         return Objects.hash(nombre, descripcion, observaciones, objetivo, 
-                duracionDias, alimentos, recomendaciones, id, usuarioId , creadorId);
+                duracionDias, alimentos, recomendaciones, id, IdCliente , IdEntrenador);
     }
 
     @Override
     public String toString(){
         return "La dieta es: "+nombre+ ", descripcion: "+descripcion+", observaciones: "+observaciones
             + ", objetivo: "+objetivo+ ", duracion: "+duracionDias+ "alimentos: "+alimentos.toString()
-            +", recomendaciones:"+recomendaciones+", id: "+id+", usuarioId: "+usuarioId+", creadorId: "+creadorId;
+            +", recomendaciones:"+recomendaciones+", id: "+id+", IdEntrenador: "+IdEntrenador+", IdCliente: "+IdCliente;
     }
 
 
