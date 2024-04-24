@@ -21,9 +21,9 @@ public class Dieta{
     @Id
     @GeneratedValue
     private Long id;
-    private Set<Long> IdCliente;
     @ElementCollection
-    private Long IdEntrenador;
+    private Set<Long> clienteId;
+    private Long entrenadorId;
 
     /*
     //Definimos constructor
@@ -75,11 +75,11 @@ public class Dieta{
     }
 
     public Set<Long> getCliente() {
-        return IdCliente;
+        return clienteId;
     }
 
     public Long getEntrenadorId() {
-        return IdEntrenador;
+        return entrenadorId;
     }
 
     public void setNombre(String nombre) {
@@ -111,11 +111,11 @@ public class Dieta{
     }
 
     public void setCliente(Set<Long> IdCliente) {
-        this.IdCliente = IdCliente;
+        this.clienteId = IdCliente;
     }
 
     public void setEntrenador(Long IdEntrenador) {
-        this.IdEntrenador = IdEntrenador;
+        this.entrenadorId = IdEntrenador;
     }
 
     @Override
@@ -133,14 +133,14 @@ public class Dieta{
     @Override
     public int hashCode(){
         return Objects.hash(nombre, descripcion, observaciones, objetivo, 
-                duracionDias, alimentos, recomendaciones, id, IdCliente , IdEntrenador);
+                duracionDias, alimentos, recomendaciones, id, clienteId , entrenadorId);
     }
 
     @Override
     public String toString(){
         return "La dieta es: "+nombre+ ", descripcion: "+descripcion+", observaciones: "+observaciones
             + ", objetivo: "+objetivo+ ", duracion: "+duracionDias+ "alimentos: "+alimentos.toString()
-            +", recomendaciones:"+recomendaciones+", id: "+id+", IdEntrenador: "+IdEntrenador+", IdCliente: "+IdCliente;
+            +", recomendaciones:"+recomendaciones+", id: "+id+", IdEntrenador: "+entrenadorId+", IdCliente: "+ clienteId;
     }
 
 
