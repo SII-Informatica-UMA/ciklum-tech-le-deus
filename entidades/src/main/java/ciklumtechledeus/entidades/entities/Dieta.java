@@ -14,6 +14,7 @@ public class Dieta{
     private String descripcion;
     private String observaciones;
     private String objetivo;
+    @Column(name="DURACION_DIAS")
     private int duracionDias;
     @ElementCollection
     private ArrayList<String> alimentos;
@@ -22,7 +23,9 @@ public class Dieta{
     @GeneratedValue
     private Long id;
     @ElementCollection
+    @Column(name = "ID_CLIENTE", nullable=false)
     private Set<Long> clienteId;
+    @Column(name = "ID_ENTRENADOR", nullable=false)
     private Long entrenadorId;
 
     /*
@@ -140,7 +143,7 @@ public class Dieta{
     public String toString(){
         return "La dieta es: "+nombre+ ", descripcion: "+descripcion+", observaciones: "+observaciones
             + ", objetivo: "+objetivo+ ", duracion: "+duracionDias+ "alimentos: "+alimentos.toString()
-            +", recomendaciones:"+recomendaciones+", id: "+id+", IdEntrenador: "+entrenadorId+", IdCliente: "+ clienteId;
+            +", recomendaciones:"+recomendaciones+", id: "+id+", IdEntrenador: "+entrenadorId+", IdCliente: "+ clienteId.toString();
     }
 
 
