@@ -7,7 +7,7 @@ import ciklumtechledeus.entidades.entities.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
+import org.springframework.data.jpa.repository.Modifying;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +20,11 @@ public interface DietaRepository extends JpaRepository<Dieta, Integer> {
     @Query("UPDATE Dieta SET clienteId = :clienteId WHERE id = :id AND entrenadorId = :entrenadorId")
     void updateCliente(@Param("entrenadorId") Long entrenadorId, @Param("clienteId") Set<Long> clienteId,@Param("id") Long id);
     
+    @Modifying
+    @Query("DELETE FROM Dieta d WHERE d.id = :id AND d.entrenadorId = :entrenadorId")
+    void deleteByIdAndEntrenadorId(@Param("id") Long id, @Param("entrenadorId") Long entrenadorId);
+
+
     List<Dieta> findByClienteId(Set<Long> clienteId);
     List<Dieta> findByEntrenadorId(Long entrenadorid);
     List<Dieta> findByNombre(String nombre);
