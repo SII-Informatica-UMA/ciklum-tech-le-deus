@@ -2,11 +2,26 @@ package ciklumtechledeus.entidades.entities;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.Objects;
+//import java.util.ArrayList;
+import java.util.List;
+//import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@EqualsAndHashCode
+@ToString
 @Entity 
 public class Dieta{
 
@@ -15,18 +30,18 @@ public class Dieta{
     private String observaciones;
     private String objetivo;
     @Column(name="DURACION_DIAS")
-    private int duracionDias;
+    private Integer duracionDias;
     @ElementCollection
-    private ArrayList<String> alimentos;
+    private List<String> alimentos;
     private String recomendaciones;
     @Id
     @GeneratedValue
     private Long id;
     @ElementCollection
     @Column(name = "ID_CLIENTE", nullable=false)
-    private Set<Long> clienteId;
+    private Set<Long> idClientes;
     @Column(name = "ID_ENTRENADOR", nullable=false)
-    private Long entrenadorId;
+    private Long idEntrenador;
 
     /*
     //Definimos constructor
@@ -44,7 +59,7 @@ public class Dieta{
     }*/
 
     //Getters y Setters 
-    
+    /*
     public String getNombre(){
         return nombre;
     }
@@ -145,6 +160,11 @@ public class Dieta{
             + ", objetivo: "+objetivo+ ", duracion: "+duracionDias+ "alimentos: "+alimentos.toString()
             +", recomendaciones:"+recomendaciones+", id: "+id+", IdEntrenador: "+entrenadorId+", IdCliente: "+ clienteId.toString();
     }
+
+    public List<Dieta> getIdClientes() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getIdClientes'");
+    }*/
 
 
 }
