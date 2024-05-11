@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public interface DietaRepository extends JpaRepository<Dieta, Integer> {
+public interface DietaRepository extends JpaRepository<Dieta, Long> {
+    
     @Query("INSERT INTO Dieta(nombre, descripcion, observaciones, objetivo, duracionDias, alimentos, recomendaciones, entrenadorId, clienteId) VALUES (:nombre, :descripcion, :observaciones, :objetivo, :duracionDias, :alimentos, :recomendaciones, :entrenadorId, :clienteId)")
     void insertDieta(@Param("nombre") String nombre, @Param("descripcion") String descripcion, @Param("observaciones") String observaciones, @Param("objetivo") String objetivo, @Param("duracionDias") int duracionDias, @Param("alimentos") ArrayList<String> alimentos, @Param("recomendaciones") String recomendaciones, @Param("entrenadorId") Long entrenadorId, @Param("clienteId") Set<Long> clienteId);
     @Query("UPDATE Dieta SET nombre = :nombre, descripcion = :descripcion, observaciones = :observaciones, objetivo = :objetivo, duracionDias = :duracionDias, alimentos = :alimentos, recomendaciones = :recomendaciones, clienteId = :clienteId WHERE id = :id AND entrenadorId = :entrenadorId")
@@ -23,8 +24,13 @@ public interface DietaRepository extends JpaRepository<Dieta, Integer> {
     @Modifying
     @Query("DELETE FROM Dieta d WHERE d.id = :id AND d.entrenadorId = :entrenadorId")
     void deleteByIdAndEntrenadorId(@Param("id") Long id, @Param("entrenadorId") Long entrenadorId);
-
-
+    
+    //
+    List<Dieta> findAllByIdEntrenador(Long idEntrenador);
+    @Query("SELECT d FROM Dieta d WHERE :idCliente MEMBER OF d.idClientes")
+    List<Dieta> findByIdClientesContaining(Long idCliente);
+    //
+    
     List<Dieta> findByClienteId(Set<Long> clienteId);
     List<Dieta> findByEntrenadorId(Long entrenadorid);
     List<Dieta> findByNombre(String nombre);
