@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.Modifying;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface DietaRepository extends JpaRepository<Dieta, Long> {
@@ -21,17 +22,19 @@ public interface DietaRepository extends JpaRepository<Dieta, Long> {
     @Query("UPDATE Dieta SET clienteId = :clienteId WHERE id = :id AND entrenadorId = :entrenadorId")
     void updateCliente(@Param("entrenadorId") Long entrenadorId, @Param("clienteId") Set<Long> clienteId,@Param("id") Long id);
     
+
+    /*
     @Modifying
     @Query("DELETE FROM Dieta d WHERE d.id = :id AND d.entrenadorId = :entrenadorId")
     void deleteByIdAndEntrenadorId(@Param("id") Long id, @Param("entrenadorId") Long entrenadorId);
-    
+    */
     //
-    List<Dieta> findAllByIdEntrenador(Long idEntrenador);
+    List<Dieta> findAllByEntrenadorId(Long idEntrenador);
     @Query("SELECT d FROM Dieta d WHERE :idCliente MEMBER OF d.idClientes")
-    List<Dieta> findByIdClientesContaining(Long idCliente);
+
     //
-    
-    List<Dieta> findByClienteId(Set<Long> clienteId);
+    List<Dieta> findAllByNombre(String nombre);
+    List<Dieta> findByClienteId(Long clienteId);
     List<Dieta> findByEntrenadorId(Long entrenadorid);
-    List<Dieta> findByNombre(String nombre);
+    Optional<Dieta> findByNombre(String nombre);
 }

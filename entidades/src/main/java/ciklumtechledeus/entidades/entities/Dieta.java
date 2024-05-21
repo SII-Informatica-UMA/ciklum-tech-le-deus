@@ -38,10 +38,10 @@ public class Dieta{
     @GeneratedValue
     private Long id;
     @ElementCollection
-    @Column(name = "ID_CLIENTE", nullable=false)
-    private Set<Long> idClientes;
-    @Column(name = "ID_ENTRENADOR", nullable=false)
-    private Long idEntrenador;
+    private Set<Long> clienteId;
+    //private Set<Long> IdCliente;
+    //private Long IdEntrenador;
+    private Long entrenadorId;
 
     /*
     //Definimos constructor

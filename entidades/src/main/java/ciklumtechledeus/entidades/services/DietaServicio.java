@@ -3,44 +3,67 @@ package ciklumtechledeus.entidades.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import ciklumtechledeus.entidades.entities.Dieta;
+import ciklumtechledeus.entidades.exceptions.DietaExistenteException;
 import ciklumtechledeus.entidades.exceptions.DietaNoExisteException;
 import ciklumtechledeus.entidades.repositories.DietaRepository;
+import jakarta.transaction.Transactional;
 
+import java.util.Collections;
+import java.util.Optional;
+import java.util.List;
+
+
+@Service
+@Transactional
 public class DietaServicio {
-    private DietaRepository repo;
+    private DietaRepository dietaRepo;
 
     public DietaServicio(DietaRepository dietaRepository){
-        this.repo = dietaRepository;
+        this.dietaRepo = dietaRepository;
     }
 
     public List<Dieta> dietasDeEntrenador(Long idEntrenador) {
-      return this.repo.findAllByIdEntrenador(idEntrenador);
+      return this.dietaRepo.findAllByEntrenadorId(idEntrenador);
    }
 
    public List<Dieta> dietasDeCliente(Long idCliente) {
-      return this.repo.findByIdClientesContaining(idCliente);
+      return this.dietaRepo.findByClienteId(idCliente);
    }
 
-   public Dieta actualizarDieta(Dieta g) {
-      return (Dieta)this.repo.save(g);
-   }
+   public Dieta actualizarDieta(Dieta dieta) {
+      if (dietaRepo.existsById(dieta.getId())) {
+          return dietaRepo.save(dieta);
+      } else {
+          throw new DietaNoExisteException("Dieta no encontrada");
+      }
+  }
+  
 
    public Optional<Dieta> getDieta(Long id) {
-      return this.repo.findById(id);
+      return this.dietaRepo.findById(id);
    }
 
-   public void deleteDieta(Long id) {
-    this.repo.deleteById(id);
+   public void deleteDietaById(Long id) {
+      var dieta = dietaRepo.findById(id);
+      if(!dieta.isPresent()){
+
+      }else{
+            this.dietaRepo.deleteById(id);
+         
+      }
    }
 
    public void putDieta(Long idDieta, Long idCliente) {
       Optional<Dieta> d = this.getDieta(idDieta);
       d.ifPresent((dieta) -> {
-         dieta.getIdClientes().add(idCliente);
-         this.repo.save(dieta);
+         dieta.getClienteId().add(idCliente);
+         this.dietaRepo.save(dieta);
       });
       d.orElseThrow(DietaNoExisteException::new);
    }
     
+
 }
