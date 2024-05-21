@@ -22,7 +22,7 @@ public class DietaNuevaDTO {
     private String descripcion;
     private String observaciones;
     private String objetivo;
-    private Integer duracionDias;
+    private int duracionDias;
     private List<String> alimentos;
     private String recomendaciones;
 }

@@ -5,11 +5,6 @@ import ciklumtechledeus.entidades.dtos.DietaNuevaDTO;
 import ciklumtechledeus.entidades.entities.Dieta;
 
 public class Mapper {
-    public static DietaDTO toDietaDTO(Dieta dieta) {
-        return DietaDTO.builder()
-            .id(dieta.getId())
-            .build();
-    }
 
     
     public static Dieta toDieta(DietaNuevaDTO dietaNuevaDTO) {
@@ -24,9 +19,16 @@ public class Mapper {
             .build();
     }
 
-    public static Dieta toDieta2(DietaDTO dietaDTO) {
-        return ciklumtechledeus.entidades.entities.Dieta.builder()
-            .id(dietaDTO.getId())
+    public static DietaDTO toDietaDTO(Dieta dieta) {
+        return DietaDTO.builder()
+            .id(dieta.getId())
+            .nombre(dieta.getNombre())
+            .descripcion(dieta.getDescripcion())
+            .observaciones(dieta.getObservaciones())
+            .objetivo(dieta.getObjetivo())
+            .duracionDias(dieta.getDuracionDias())
+            .alimentos(dieta.getAlimentos())
+            .recomendaciones(dieta.getRecomendaciones())
             .build();
     }
 
