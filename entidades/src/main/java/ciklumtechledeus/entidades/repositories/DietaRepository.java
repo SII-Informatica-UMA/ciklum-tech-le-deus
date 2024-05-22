@@ -21,27 +21,31 @@ public interface DietaRepository extends JpaRepository<Dieta, Long> {
     
     @Modifying
     @Transactional
-    @Query("UPDATE Dieta SET nombre = :nombre, descripcion = :descripcion, observaciones = :observaciones, objetivo = :objetivo, duracionDias = :duracionDias, alimentos = :alimentos, recomendaciones = :recomendaciones, clienteId = :clienteId WHERE id = :id AND entrenadorId = :entrenadorId")
-    void updateDieta(@Param("nombre") String nombre, @Param("descripcion") String descripcion, @Param("observaciones") String observaciones, @Param("objetivo") String objetivo, @Param("duracionDias") int duracionDias, @Param("alimentos") ArrayList<String> alimentos, @Param("recomendaciones") String recomendaciones, @Param("entrenadorId") Long entrenadorId, @Param("clienteId") Set<Long> clienteId,@Param("id") Long id);
-    
+    @Query("UPDATE Dieta d SET d.nombre = :nombre, d.descripcion = :descripcion, d.observaciones = :observaciones, d.objetivo = :objetivo, d.duracionDias = :duracionDias, d.alimentos = :alimentos, d.recomendaciones = :recomendaciones, d.clienteId = :clienteId WHERE d.id = :id AND d.entrenadorId = :entrenadorId")
+    void updateDieta(@Param("nombre") String nombre, @Param("descripcion") String descripcion, @Param("observaciones") String observaciones, @Param("objetivo") String objetivo, @Param("duracionDias") int duracionDias, @Param("alimentos") ArrayList<String> alimentos, @Param("recomendaciones") String recomendaciones, @Param("entrenadorId") Long entrenadorId, @Param("clienteId") Set<Long> clienteId, @Param("id") Long id);
+
     @Modifying
     @Transactional
-    @Query("UPDATE Dieta SET clienteId = :clienteId WHERE id = :id AND entrenadorId = :entrenadorId")
-    void updateCliente(@Param("entrenadorId") Long entrenadorId, @Param("clienteId") Set<Long> clienteId,@Param("id") Long id);
-    
-
-
+    @Query("UPDATE Dieta d SET d.clienteId = :clienteId WHERE d.id = :id AND d.entrenadorId = :entrenadorId")
+    void updateCliente(@Param("entrenadorId") Long entrenadorId, @Param("clienteId") Set<Long> clienteId, @Param("id") Long id);
+  
     @Modifying
     @Transactional
     @Query("DELETE FROM Dieta d WHERE d.id = :id AND d.entrenadorId = :entrenadorId")
     void deleteByIdAndEntrenadorId(@Param("id") Long id, @Param("entrenadorId") Long entrenadorId);
     
-    
     List<Dieta> findAllByEntrenadorId(Long idEntrenador);
-    @Query("SELECT d FROM Dieta d WHERE :idCliente MEMBER OF d.idClientes")
+   
+    // Define una consulta JPQL que selecciona todas las entidades Dieta (d) 
+    // donde el valor idCliente es un miembro del conjunto d.clienteId.
+    @Query("SELECT d FROM Dieta d WHERE :idCliente MEMBER OF d.clienteId")
+    List<Dieta> findAllByClienteId(@Param("idCliente") Long idCliente);
 
     List<Dieta> findAllByNombre(String nombre);
+
+   
     List<Dieta> findByClienteId(Long clienteId);
+    
     List<Dieta> findByEntrenadorId(Long entrenadorid);
     Optional<Dieta> findByNombre(String nombre);
 }

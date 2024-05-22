@@ -3,6 +3,7 @@ package ciklumtechledeus.entidades.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ciklumtechledeus.entidades.entities.Dieta;
@@ -11,16 +12,13 @@ import ciklumtechledeus.entidades.exceptions.DietaNoExisteException;
 import ciklumtechledeus.entidades.repositories.DietaRepository;
 import jakarta.transaction.Transactional;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.List;
-
 
 @Service
 @Transactional
 public class DietaServicio {
     private DietaRepository dietaRepo;
 
+    @Autowired
     public DietaServicio(DietaRepository dietaRepository){
         this.dietaRepo = dietaRepository;
     }
@@ -41,28 +39,25 @@ public class DietaServicio {
       }
   }
   
-
    public Optional<Dieta> getDieta(Long id) {
       return this.dietaRepo.findById(id);
    }
 
    public void deleteDietaById(Long id) {
-      var dieta = dietaRepo.findById(id);
-      if(!dieta.isPresent()){
-
-      }else{
-            this.dietaRepo.deleteById(id);
-         
-      }
+      if (dietaRepo.existsById(id)) {
+         dietaRepo.deleteById(id);
+     } else {
+         throw new DietaNoExisteException("Dieta no encontrada");
+     }
    }
 
    public void putDieta(Long idDieta, Long idCliente) {
-      Optional<Dieta> d = this.getDieta(idDieta);
-      d.ifPresent((dieta) -> {
+      dietaRepo.findById(idDieta).ifPresentOrElse(dieta -> {
          dieta.getClienteId().add(idCliente);
-         this.dietaRepo.save(dieta);
-      });
-      d.orElseThrow(DietaNoExisteException::new);
+         dietaRepo.save(dieta);
+     }, () -> {
+         throw new DietaNoExisteException("Dieta no encontrada");
+     });
    }
     
 
