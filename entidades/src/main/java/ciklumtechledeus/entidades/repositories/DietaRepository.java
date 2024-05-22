@@ -32,7 +32,6 @@ public interface DietaRepository extends JpaRepository<Dieta, Long> {
     List<Dieta> findAllByEntrenadorId(Long idEntrenador);
     @Query("SELECT d FROM Dieta d WHERE :idCliente MEMBER OF d.idClientes")
 
-    //
     List<Dieta> findAllByNombre(String nombre);
     List<Dieta> findByClienteId(Long clienteId);
     List<Dieta> findByEntrenadorId(Long entrenadorid);
