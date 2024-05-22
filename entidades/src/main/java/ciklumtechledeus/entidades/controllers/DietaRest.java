@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,8 +32,9 @@ import ciklumtechledeus.entidades.exceptions.DietaNoExisteException;
 @RestController
 @RequestMapping({"/dieta"})
 public class DietaRest {
-    private DietaServicio servicio;
+    private final DietaServicio servicio;
 
+    @Autowired
     public DietaRest(DietaServicio servicio){
         this.servicio = servicio;
     }
@@ -50,12 +52,11 @@ public class DietaRest {
          } else {
             dietas = this.servicio.dietasDeCliente(idCliente);
          }
-
          return dietas.stream().map(Mapper::toDietaDTO).toList();
       }
     }
 
-    
+    //Por aqui
     @PostMapping
     public ResponseEntity<DietaDTO> createDieta(@RequestParam(value = "entrenador",required = true) Long idEntrenador, @RequestBody DietaNuevaDTO dietaNuevoDTO, UriComponentsBuilder uriBuilder) {
       Dieta g = Mapper.toDieta(dietaNuevoDTO);
