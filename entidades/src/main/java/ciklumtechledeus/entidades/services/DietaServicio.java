@@ -16,7 +16,8 @@ import jakarta.transaction.Transactional;
 @Service
 @Transactional
 public class DietaServicio {
-    private DietaRepository dietaRepo;
+   // Ponemos final para prevenir la inmutabilidad y reasignacion despues de la inicializacion 
+   private final DietaRepository dietaRepo;
 
     @Autowired
     public DietaServicio(DietaRepository dietaRepository){
