@@ -283,6 +283,31 @@ class DietasApplicationTests {
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
 		}
 
+		@Test
+		@DisplayName("actualiza una dieta correctamente")
+		public void actualizaDietaCorrectamente(){
+			var dieta4 = new Dieta();
+            dieta4.setId(4L);
+            dieta4.setNombre("Dieta 4");
+            dieta4.setDescripcion("Dieta para mantener");
+            dieta4.setObservaciones("Comer sano");
+            dieta4.setObjetivo("Mantener peso");
+            dieta4.setEntrenadorId(1L);
+            repoDieta.save(dieta4);
+
+			var dietaNueva = DietaDTO.builder()
+							.nombre("Dieta para Jaime")
+							.descripcion("Dieta para definicion")
+							.observaciones("No tomar mucho azucar")
+							.recomendaciones("15000 pasos diarios")
+							.build();
+			var peticion = put("http", "localhost", port, "/dieta/4", dietaNueva);
+			var respuesta = restTemplate.exchange(peticion, DietaDTO.class);
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			Dieta act = repoDieta.findById(4l).get();
+			assertThat(act.getNombre()).isEqualTo("Dieta para Jaime");
+
+		}
 
 
 
