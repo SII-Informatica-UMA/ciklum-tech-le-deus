@@ -190,6 +190,26 @@ class DietasApplicationTests {
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 				.endsWith("/"+dietas.get(0).getId());
 		}
+		/*    @Test
+		@DisplayName("devuelve error cuando no aporto información del ingrediente al insertar producto")
+		public void errorAlInsertarProductoSinInfoDeIngrediente() {
+
+			var ingrediente = IngredienteDTO.builder().build();
+			
+			// Preparamos el producto a insertar
+			var producto = ProductoDTO.builder()
+					.nombre("Hamburguesa")
+					.ingredientes(Collections.singleton(ingrediente))
+					.build();
+			// Preparamos la petición con el ingrediente dentro
+			var peticion = post("http", "localhost",port, "/productos", producto);
+
+			// Invocamos al servicio REST 
+			var respuesta = restTemplate.exchange(peticion,Void.class);
+
+			// Comprobamos el resultado
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+		}*/
 
 		
 	}
@@ -199,6 +219,73 @@ class DietasApplicationTests {
     @DisplayName("cuando la base de datos contiene datos")
     public class BaseDeDatosConDatos {
 	
+		@BeforeEach
+		public void insertarDatos(){
+			var dieta1 = new Dieta();
+			dieta1.setId(1L);
+			dieta1.setNombre("Dieta 1");
+			dieta1.setDescripcion("Dieta para definición");
+			dieta1.setObservaciones("15000 pasos diarios");
+			dieta1.setObjetivo("1800 kcal al dia");
+			dieta1.setDuracionDias(30);
+			repoDieta.save(dieta1);
+
+			var dieta2 = new Dieta();
+			dieta2.setId(2L);
+			dieta2.setNombre("Dieta 2");
+			dieta2.setDescripcion("Dieta para ganar masa muscular");
+			dieta2.setObservaciones("uso de batidos de proteina");
+			dieta2.setObjetivo("3500 kcal al dia");
+			dieta2.setDuracionDias(30);
+			dieta2.setEntrenadorId(1L);
+			repoDieta.save(dieta2);
+		}
+
+		//Revisar
+		@Test
+		@DisplayName("da error cuando inserta dieta existente")
+		public void insertaDietaExistente(){
+			var dieta = DietaDTO.builder()
+						.nombre("Dieta 1")
+						.descripcion("Dieta para definición")
+						.observaciones("15000 pasos diarios")
+						.objetivo("1800 kcal al dia")
+						.duracionDias(30).build();
+			var peticion = post("http", "localhost", port, "/dieta/1", dieta);	
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+			
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+		}
+
+		@Test
+		@DisplayName("devuelve una dieta recibiendo un id")
+		public void getDietaById(){
+			var peticion = get("http", "localhost", port, "/dieta/2");
+			var respuesta = restTemplate.exchange(peticion, DietaDTO.class);
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(respuesta.getBody().getId()).isEqualTo(2L);
+		}
+
+		@Test
+		@DisplayName("elimina dieta correctamente")
+		public void eliminaDietaCorrectamente(){
+			var peticion = delete("http", "localhost", port, "/dieta/1");
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+
+		}
+
+		@Test
+		@DisplayName("elimina dieta que no existe")
+		public void eliminaDietaInexistente(){
+			var peticion = delete("http", "localhost", port, "/dieta/3");
+			var respuesta = restTemplate.exchange(peticion, void.class);
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+		}
+
+
+
+
 	}
 
 }
