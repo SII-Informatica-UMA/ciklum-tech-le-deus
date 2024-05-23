@@ -26,7 +26,7 @@ public class Command implements CommandLineRunner {
             System.out.println(s);
         }
         if(args.length > 0){
-            for(Dieta d : dietaRepository.findByNombre(args[0])){
+            for(Dieta d : dietaRepository.findAllByNombre(args[0])){
                 System.out.println(d);
             }
         }
