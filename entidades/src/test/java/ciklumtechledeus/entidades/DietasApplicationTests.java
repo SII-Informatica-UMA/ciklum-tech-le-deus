@@ -1,14 +1,18 @@
 package ciklumtechledeus.entidades;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.test.annotation.DirtiesContext;
@@ -16,6 +20,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
 
+import ciklumtechledeus.entidades.dtos.DietaDTO;
 import ciklumtechledeus.entidades.entities.Dieta;
 import ciklumtechledeus.entidades.repositories.DietaRepository;
 
@@ -51,6 +56,23 @@ class DietasApplicationTests {
         }
         return ub.build();
 	}
+
+	//Para descubrir las capacidades de comunicación del servidor y los métodos HTTP permitidos para un recurso.
+	private RequestEntity<Void> options(String scheme, String host, int port, String path) {
+		URI uri = uri(scheme, host, port, path);
+		var peticion = RequestEntity.options(uri)
+			.build();
+		return peticion;
+	}
+
+	//Para obtener los metadatos de un recurso sin obtener el cuerpo del recurso.
+	private RequestEntity<Void> head(String scheme, String host, int port, String path) {
+		URI uri = uri(scheme, host, port, path);
+		var peticion = RequestEntity.head(uri)
+			.build();
+		return peticion;
+	}
+
 
 	private RequestEntity<Void> get(String scheme, String host, int port, String path) {
         URI uri = uri(scheme, host, port, path);
@@ -89,9 +111,94 @@ class DietasApplicationTests {
 //		assertThat(actual.getEntrenadorId()).isEqualTo(expected.getClienteId());
 	}
 
-
 	@Test
 	void contextLoads() {
+	}
+
+	@Nested
+	@DisplayName("cuando no hay dietas")
+	public class BaseDeDatosSinDatos{
+
+		@Test
+		@DisplayName("devuelve la lista de dietas")
+		public void devuelveDietas() {
+			var peticion = get("http", "localhost", port, "/dieta");
+
+			var respuesta = restTemplate.exchange(peticion,
+				new ParameterizedTypeReference<Set<Dieta>>() {});
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(respuesta.getBody().isEmpty());
+		}
+
+		@Test
+		@DisplayName("error al obtener una dieta concreto")
+		public void errorAlObtenerDietaConcreta(){
+			var peticion = get("http", "localhost", port, "/dieta/1");
+
+			var respuesta = restTemplate.exchange(peticion, 
+				new ParameterizedTypeReference<DietaDTO>() {});
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);	
+		}
+
+		@Test
+		@DisplayName("devuelve error al modificar una dieta que no existe")
+		public void modificarDietaInexistente(){
+			var dieta = DietaDTO.builder().id(1L)
+										.nombre("Jaime")
+										.descripcion("baja en caloria")
+										.observaciones("100 g proteinas necesarias")
+										.objetivo("2 kilos en un mes")
+										.duracionDias(30)
+										.recomendaciones("beber mucha agua")
+										.build();
+			var peticion = put("http", "localhost", port, "/dieta/1", dieta);
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);			
+		}
+
+		@Test
+		@DisplayName("devuelve error al eliminar una dieta que no existe")
+		public void eliminarDietaInexistente(){
+			var peticion = delete("http", "localhost", port, "/dieta/1");
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+		}
+
+		@Test
+		@DisplayName("inserta correctamente una dieta")
+		public void insertaDieta(){
+			var dieta = DietaDTO.builder()
+						.id(1L)
+						.nombre("Jaime")
+						.descripcion("baja en caloria")
+						.observaciones("100 g proteinas necesarias")
+						.objetivo("2 kilos en un mes")
+						.duracionDias(30)
+						.recomendaciones("beber mucha agua")
+						.build();
+			var peticion = post("http", "localhost", port, "/dieta/1", dieta);
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+
+			//Comprobamos el resultado
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
+			assertThat(respuesta.getHeaders().get("Location").get(0))
+				.startsWith("http://localhost:"+port+"/dieta");
+			
+			List<Dieta> dietas = repoDieta.findAll();
+			assertThat(dietas).hasSize(1);
+			assertThat(respuesta.getHeaders().get("Location").get(0))
+				.endsWith("/"+dietas.get(0).getId());
+		}
+
+		
+	}
+
+
+	@Nested 
+    @DisplayName("cuando la base de datos contiene datos")
+    public class BaseDeDatosConDatos {
+	
 	}
 
 }

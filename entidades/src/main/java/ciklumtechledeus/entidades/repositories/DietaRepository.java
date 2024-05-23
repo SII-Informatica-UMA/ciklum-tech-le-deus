@@ -43,6 +43,7 @@ public interface DietaRepository extends JpaRepository<Dieta, Long> {
 
     List<Dieta> findAllByNombre(String nombre);
 
+    List<Dieta> findAll();
    
     List<Dieta> findByClienteId(Long clienteId);
     
