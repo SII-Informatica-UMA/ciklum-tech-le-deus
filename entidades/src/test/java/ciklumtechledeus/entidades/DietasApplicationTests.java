@@ -8,14 +8,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
@@ -23,12 +28,12 @@ import org.springframework.web.util.UriBuilderFactory;
 import ciklumtechledeus.entidades.dtos.DietaDTO;
 import ciklumtechledeus.entidades.entities.Dieta;
 import ciklumtechledeus.entidades.repositories.DietaRepository;
+import jakarta.transaction.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DisplayName("En el servicio de dietas")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class DietasApplicationTests {
 
@@ -111,12 +116,10 @@ class DietasApplicationTests {
 //		assertThat(actual.getEntrenadorId()).isEqualTo(expected.getClienteId());
 	}
 
-	@Test
-	void contextLoads() {
-	}
 
 	@Nested
 	@DisplayName("cuando no hay dietas")
+	@Transactional
 	public class BaseDeDatosSinDatos{
 
 		@Test
@@ -131,6 +134,7 @@ class DietasApplicationTests {
 			assertThat(respuesta.getBody().isEmpty());
 		}
 
+		
 		@Test
 		@DisplayName("error al obtener una dieta concreto")
 		public void errorAlObtenerDietaConcreta(){
@@ -308,7 +312,6 @@ class DietasApplicationTests {
 			assertThat(act.getNombre()).isEqualTo("Dieta para Jaime");
 
 		}
-
 
 
 	}
