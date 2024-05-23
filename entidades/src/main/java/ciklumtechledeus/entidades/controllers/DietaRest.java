@@ -27,11 +27,14 @@ import ciklumtechledeus.entidades.services.DietaServicio;
 import ciklumtechledeus.entidades.dtos.DietaDTO;
 import ciklumtechledeus.entidades.dtos.DietaNuevaDTO;
 import ciklumtechledeus.entidades.entities.Dieta;
+import ciklumtechledeus.entidades.exceptions.DietaExistenteException;
 import ciklumtechledeus.entidades.exceptions.DietaNoExisteException;
 
 @RestController
-@RequestMapping({"/dieta"})
+@RequestMapping(path = "/dieta")
 public class DietaRest {
+
+    public static final String dieta_path = "/dieta";
     private final DietaServicio servicio;
 
     @Autowired
@@ -56,62 +59,72 @@ public class DietaRest {
       }
     }
 
-    //Por aqui
     @PostMapping
-    public ResponseEntity<DietaDTO> createDieta(@RequestParam(value = "entrenador",required = true) Long idEntrenador, @RequestBody DietaNuevaDTO dietaNuevoDTO, UriComponentsBuilder uriBuilder) {
-      Dieta g = Mapper.toDieta(dietaNuevoDTO);
-      g.setId((Long)null);
-      g.setIdEntrenador(idEntrenador);
-      g = this.servicio.actualizarDieta(g);
-      return ResponseEntity.created((URI)this.generadorUri(uriBuilder.build()).apply(g)).body(Mapper.toDietaDTO(g));
-   }
-
-   public Function<Dieta , URI> generadorUri(UriComponents uriBuilder) {
-        return (g) -> {
-            return UriComponentsBuilder.newInstance().uriComponents(uriBuilder).path("/dieta").path(String.format("/%d", g.getId())).build().toUri();
-        };
+    public ResponseEntity<DietaDTO> createDieta(@RequestParam(value = "entrenador", required = true) Long idEntrenador,
+                                                @RequestBody DietaNuevaDTO dietaNuevoDTO,
+                                                UriComponentsBuilder uriBuilder) {
+        Dieta g = Mapper.toDietaNueva(dietaNuevoDTO);
+        g.setId(null);
+        g.setEntrenadorId(idEntrenador);
+        g = this.servicio.actualizarDieta(g);
+        URI location = this.generadorUri(uriBuilder, g.getId());
+        return ResponseEntity.created(location).body(Mapper.toDietaDTO(g));
     }
 
+    private URI generadorUri(UriComponentsBuilder uriBuilder, Long idDieta) {
+        return uriBuilder.path("/dieta/{id}")
+                         .buildAndExpand(idDieta)
+                         .toUri();
+    }
+
+    /*Revisar */
     @PutMapping
-   public ResponseEntity<DietaDTO> asociarDieta(@RequestParam(value = "cliente",required = true) Long idCliente, @RequestBody DietaDTO dietaDTO) {
-      this.servicio.putDieta(dietaDTO.getId(), idCliente);
-      return ResponseEntity.of(this.servicio.getDieta(dietaDTO.getId()).map(Mapper::toDietaDTO));
-   }
-
-   @GetMapping({"/{idDieta}"})
-   public ResponseEntity<DietaDTO> getDieta(@PathVariable Long idDieta) {
-      return ResponseEntity.of(this.servicio.getDieta(idDieta).map(Mapper::toDietaDTO));
-   }
-
-   @PutMapping({"/{idDieta}"})
-   public DietaDTO actualizarDieta(@PathVariable Long idDieta, @RequestBody DietaDTO dieta) {
-      this.servicio.getDieta(idDieta).orElseThrow(() -> {
-         return new DietaNoExisteException();
-      });
-      dieta.setId(idDieta);
-      Dieta g = this.servicio.actualizarDieta(Mapper.toDieta2(dieta));
-      return Mapper.toDietaDTO(g);
-   }
-
-   @DeleteMapping({"/{idDieta}"})
-   public void deleteDieta(@PathVariable Long idDieta) {
-      this.servicio.getDieta(idDieta).orElseThrow(() -> {
-         return new DietaNoExisteException();
-      });
-      this.servicio.deleteDieta(idDieta);
-   }   
-    
-    @ExceptionHandler({IllegalArgumentException.class})
-    @ResponseStatus(
-      code = HttpStatus.BAD_REQUEST
-    )
-    public void handleIllegalArgumentException() {
+    public ResponseEntity<DietaDTO> asociarDieta(@RequestParam(value = "cliente", required = true) Long idCliente,
+                                                  @RequestBody DietaDTO dietaDTO) {
+        try {
+            this.servicio.putDieta(dietaDTO.getId(), idCliente);
+            return this.servicio.getDieta(dietaDTO.getId())
+                                .map(dieta -> ResponseEntity.ok(Mapper.toDietaDTO(dieta)))
+                                .orElseThrow(() -> new DietaNoExisteException("Dieta no encontrada"));
+        } catch (DietaNoExisteException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
-    @ExceptionHandler({DietaNoExisteException.class})
-    @ResponseStatus(
-      code = HttpStatus.NOT_FOUND
-    )
-    public void handleDietaNoExisteException() {
+    @GetMapping("/{idDieta}")
+    public ResponseEntity<DietaDTO> getDieta(@PathVariable Long idDieta) {
+        return this.servicio.getDieta(idDieta)
+                            .map(dieta -> ResponseEntity.ok(Mapper.toDietaDTO(dieta)))
+                            .orElseThrow(() -> new DietaNoExisteException("Dieta no encontrada"));
+    }
+
+    @PutMapping("/{idDieta}")
+    public ResponseEntity<DietaDTO> updateDieta(@PathVariable Long idDieta,
+                                                @RequestBody DietaDTO dietaDTO) {
+        Dieta dieta = Mapper.toDieta(dietaDTO);
+        dieta.setId(idDieta);
+        Dieta actualizada = this.servicio.actualizarDieta(dieta);
+        return ResponseEntity.ok(Mapper.toDietaDTO(actualizada));
+    }
+
+    @DeleteMapping("/{idDieta}")
+    public ResponseEntity<Void> deleteDieta(@PathVariable Long idDieta) {
+        this.servicio.deleteDietaById(idDieta);
+        return ResponseEntity.noContent().build();
+    }   
+    
+    @ExceptionHandler(DietaNoExisteException.class)
+    public ResponseEntity<String> handleDietaNoExisteException(DietaNoExisteException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(DietaExistenteException.class)
+    public ResponseEntity<String> handleDietaExistenteException(DietaExistenteException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }
