@@ -23,8 +23,11 @@ import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import ciklumtechledeus.entidades.controllers.DietaRest;
 import ciklumtechledeus.entidades.dtos.DietaDTO;
+import ciklumtechledeus.entidades.dtos.DietaNuevaDTO;
 import ciklumtechledeus.entidades.entities.Dieta;
+import ciklumtechledeus.entidades.exceptions.AccesoProhibido;
 import ciklumtechledeus.entidades.repositories.DietaRepository;
 import jakarta.transaction.Transactional;
 
@@ -54,6 +57,8 @@ class DietasApplicationTests {
 	@Value(value = "${local.server.port}")
 	private int port;
 
+	private DietaRest dietarest;
+
 	@Autowired
 	private DietaRepository repoDieta;
 
@@ -61,10 +66,13 @@ class DietasApplicationTests {
 	@Autowired
     private JwtUtil jwtTokenUtil;
 
+	private String token;
+
 	//---------------------------------------
 
 	@BeforeEach
 	public void initializeDatabase() {
+		//token = jwtTokenUtil.generateToken(User user = new User());
 		repoDieta.deleteAll();
 	}
 
@@ -94,41 +102,7 @@ class DietasApplicationTests {
 			.build();
 		return peticion;
 	}
-
-	/*
-	private RequestEntity<Void> get(String scheme, String host, int port, String path) {
-        URI uri = uri(scheme, host, port, path);
-        var peticion = RequestEntity.get(uri)
-            .accept(MediaType.APPLICATION_JSON)
-            .build();
-        return peticion;
-    }
-
-	private RequestEntity<Void> delete(String scheme, String host, int port, String path) {
-        URI uri = uri(scheme, host, port, path);
-        var peticion = RequestEntity.delete(uri)
-            .build();
-        return peticion;
-    }
-
-	private <T> RequestEntity<T> post(String scheme, String host, int port, String path, T object) {
-        URI uri = uri(scheme, host, port, path);
-        var peticion = RequestEntity.post(uri)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(object);
-        return peticion;
-    }
-
-	private <T> RequestEntity<T> put(String scheme, String host, int port, String path, T object) {
-        URI uri = uri(scheme, host, port, path);
-        var peticion = RequestEntity.put(uri)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(object);
-        return peticion;
-    }
-	*/
-
-	//--------------------------------------------------------------------------------------
+		//--------------------------------------------------------------------------------------
 	private RequestEntity<Void> get(String scheme, String host, int port, String path) {
 		URI uri = uri(scheme, host, port, path);
 		var peticion = RequestEntity.get(uri)
@@ -141,7 +115,7 @@ class DietasApplicationTests {
 	private RequestEntity<Void> delete(String scheme, String host, int port, String path) {
 		URI uri = uri(scheme, host, port, path);
 		var peticion = RequestEntity.delete(uri)
-			.headers(getHeaders())
+		.headers(getHeaders())
 			.build();
 		return peticion;
 	}
@@ -149,7 +123,7 @@ class DietasApplicationTests {
 	private <T> RequestEntity<T> post(String scheme, String host, int port, String path, T object) {
 		URI uri = uri(scheme, host, port, path);
 		var peticion = RequestEntity.post(uri)
-			.headers(getHeaders())
+		.headers(getHeaders())
 			.contentType(MediaType.APPLICATION_JSON)
 			.body(object);
 		return peticion;
@@ -158,7 +132,7 @@ class DietasApplicationTests {
 	private <T> RequestEntity<T> put(String scheme, String host, int port, String path, T object) {
 		URI uri = uri(scheme, host, port, path);
 		var peticion = RequestEntity.put(uri)
-			.headers(getHeaders())
+		.headers(getHeaders())
 			.contentType(MediaType.APPLICATION_JSON)
 			.body(object);
 		return peticion;
@@ -456,26 +430,29 @@ class DietasApplicationTests {
 		}
 
 		@Test
-		@DisplayName("actualiza una dieta correctamente")
-		public void actualizaDietaCorrectamente() {
-			var dieta = DietaDTO.builder()
-			.nombre("Actualizado")
-			.descripcion("Actualizado")
-			.observaciones("Actualizado")
-			.objetivo("Actualizado")
-			.duracionDias(30)
-			.recomendaciones("Actualizado")
-			.build();
+        @DisplayName("actualiza una dieta correctamente")
+        public void actualizaDietaCorrectamente() {
+            var dieta = DietaDTO.builder()
+                                .nombre("Actualizado")
+                                .descripcion("Actualizado")
+                                .observaciones("Actualizado")
+                                .objetivo("Actualizado")
+                                .duracionDias(30)
+                                .recomendaciones("Actualizado")
+                                .build();
+            //var peticion = put("http", "localhost", port, "/dieta/1", dieta);
+            HttpHeaders headers = getHeaders();
+            HttpEntity<DietaDTO> entity = new HttpEntity<>(dieta, headers);
+
+            // Construye la URI para la solicitud
+            URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost/:" + port + "/dieta/1")
+            .build().toUri();
+			ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(uri, HttpMethod.PUT, entity, DietaDTO.class);	
 			
-			//HttpHeaders headers = getHeaders();
-			//HttpEntity<DietaDTO> entity = new HttpEntity<>(dieta, headers);
-
-			var peticion = put("http", "localhost", port, "/dieta/1", dieta);
-
-			ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(peticion,DietaDTO.class);
-
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-			}
+				assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			
+            
+        }
 
 		@Test
 		@DisplayName("devuelve la lista de dietas de un entrenador")
@@ -498,7 +475,7 @@ class DietasApplicationTests {
 			
 			// Realiza la petición para obtener la dieta asociada a un cliente
 			var peticion = get("http", "localhost", port, "/cliente/1/dieta");
-			var respuesta = restTemplate.exchange(peticion, DietaDTO.class);
+			var respuesta = restTemplate.exchange(peticion, DietaNuevaDTO.class);
 
 			// Verifica que se recibe una respuesta exitosa y la dieta es la esperada
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
@@ -517,31 +494,7 @@ class DietasApplicationTests {
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
 		}
 
-		@Test
-		@DisplayName("actualiza una dieta correctamente")
-		public void actualizaDietaCorrectamente(){
-			var dieta4 = new Dieta();
-            dieta4.setId(4L);
-            dieta4.setNombre("Dieta 4");
-            dieta4.setDescripcion("Dieta para mantener");
-            dieta4.setObservaciones("Comer sano");
-            dieta4.setObjetivo("Mantener peso");
-            dieta4.setEntrenadorId(1L);
-            repoDieta.save(dieta4);
-
-			var dietaNueva = DietaDTO.builder()
-							.nombre("Dieta para Jaime")
-							.descripcion("Dieta para definicion")
-							.observaciones("No tomar mucho azucar")
-							.recomendaciones("15000 pasos diarios")
-							.build();
-			var peticion = put("http", "localhost", port, "/dieta/4", dietaNueva);
-			var respuesta = restTemplate.exchange(peticion, DietaDTO.class);
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-			Dieta act = repoDieta.findById(4l).get();
-			assertThat(act.getNombre()).isEqualTo("Dieta para Jaime");
-
-		}
+		
 		*/
 
 	}

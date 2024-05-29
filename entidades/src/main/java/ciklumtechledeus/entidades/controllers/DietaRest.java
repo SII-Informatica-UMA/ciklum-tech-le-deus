@@ -7,8 +7,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import ciklumtechledeus.entidades.exceptions.AccesoProhibido;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -124,6 +127,11 @@ public class DietaRest {
     public ResponseEntity<String> handleDietaNoExisteException(DietaNoExisteException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+
+    @ExceptionHandler(AccesoProhibido.class)
+    public ResponseEntity<String> handleAccesoProhibido(AccesoProhibido ex){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+     }
 
     @ExceptionHandler(DietaExistenteException.class)
     public ResponseEntity<String> handleDietaExistenteException(DietaExistenteException ex) {
