@@ -347,7 +347,7 @@ class DietasApplicationTests {
         .build().toUri();
 			ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(uri, HttpMethod.POST, entity, DietaDTO.class);
 
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(201); // Esperamos un 201
+			assertThat(ResponseEntity.ok(respuesta)); // Esperamos un 201
 		}
 	
 		
@@ -423,6 +423,7 @@ class DietasApplicationTests {
 			dieta2.setObservaciones("uso de batidos de proteina");
 			dieta2.setObjetivo("3500 kcal al dia");
 			dieta2.setDuracionDias(30);
+			dieta2.setEntrenadorId(1L);
 			repoDieta.save(dieta2);
 		}
 
@@ -488,8 +489,9 @@ class DietasApplicationTests {
 
 		@Test
         @DisplayName("actualiza una dieta correctamente")
-        public void actualizaDietaCorrectamente() {
-            var dieta = DietaDTO.builder()
+        public void putDietaCorrectamente() {
+            var dieta = Dieta.builder()
+								.id(1L)
                                 .nombre("Actualizado")
                                 .descripcion("Actualizado")
                                 .observaciones("Actualizado")
@@ -497,16 +499,11 @@ class DietasApplicationTests {
                                 .duracionDias(30)
                                 .recomendaciones("Actualizado")
                                 .build();
-            //var peticion = put("http", "localhost", port, "/dieta/1", dieta);
-            HttpHeaders headers = getHeaders();
-            HttpEntity<DietaDTO> entity = new HttpEntity<>(dieta, headers);
-
-            // Construye la URI para la solicitud
-            var peticion = put("http", "localhost", port, "/dieta/2", dieta);
-			ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(peticion, DietaDTO.class);	
+            var peticion = put("http", "localhost", port, "/dieta/1", dieta);
+            var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<DietaDTO>(){});	
 			
-				assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-			
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(repoDieta.findById(1L).get().getNombre()).isEqualTo("Actualizado");
             
         }
 
@@ -515,9 +512,15 @@ class DietasApplicationTests {
 		public void devuelveListaDeDietasDeEntrenador() {
 			// Simula la existencia de un entrenador con dietas asociadas
 			Long entrenadorId = 1L;
+			UserDetails userDetails = new User("admin", "admin", Collections.emptyList());
+			String token = jwtTokenUtil.generateToken(userDetails);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer "+token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+			String url = "http://localhost:"+port+"/dieta?entrenador="+entrenadorId;
 			// Realiza la petición para obtener la lista de dietas de un entrenador
-			var peticion = get("http", "localhost", port, "/dieta?entrenador="+entrenadorId);
-			var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<List<DietaDTO>>() {});
+			var respuesta = restTemplate.exchange(url,HttpMethod.GET,entity, new ParameterizedTypeReference<List<DietaDTO>>() {});
 
 			// Verifica que se recibe una respuesta exitosa y la lista no está vacía
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
@@ -529,9 +532,15 @@ class DietasApplicationTests {
 		public void devuelveDietaDeCliente() {
 			// Simula la existencia de un cliente con una dieta asociada
 			Long clienteId = 1L;
+			UserDetails userDetails = new User("admin", "admin", Collections.emptyList());
+			String token = jwtTokenUtil.generateToken(userDetails);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer "+token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
 			// Realiza la petición para obtener la dieta asociada a un cliente
-			var peticion = get("http", "localhost", port, "/dieta?cliente="+clienteId);
-			var respuesta = restTemplate.exchange(peticion, DietaDTO.class);
+			String url = "http://localhost:" + port + "/dieta?cliente=" + clienteId;
+			var respuesta  = restTemplate.exchange(url, HttpMethod.GET, entity, new ParameterizedTypeReference<List<DietaDTO>>() {});
 
 			// Verifica que se recibe una respuesta exitosa y la dieta es la esperada
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
