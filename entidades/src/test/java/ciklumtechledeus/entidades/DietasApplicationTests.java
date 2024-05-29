@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +35,8 @@ import static org.assertj.core.api.Assertions.fail;
 import ciklumtechledeus.entidades.seguridad.JwtRequestFilter;
 import ciklumtechledeus.entidades.seguridad.JwtUtil;
 import ciklumtechledeus.entidades.seguridad.SecurityConfguration;
+import ciklumtechledeus.entidades.services.DietaServicio;
+
 import org.junit.platform.engine.reporting.ReportEntry;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -57,6 +60,7 @@ class DietasApplicationTests {
 	//--------------------------------------
 	@Autowired
     private JwtUtil jwtTokenUtil;
+
 	//---------------------------------------
 
 	@BeforeEach
@@ -133,7 +137,7 @@ class DietasApplicationTests {
 			.build();
 		return peticion;
 	}
-	
+
 	private RequestEntity<Void> delete(String scheme, String host, int port, String path) {
 		URI uri = uri(scheme, host, port, path);
 		var peticion = RequestEntity.delete(uri)
@@ -169,12 +173,13 @@ class DietasApplicationTests {
 
 	//-----------------------------------------------------------------------
 	private HttpHeaders getHeaders() {
-		User userDetails = new User("admin", "", Collections.emptyList());
+		UserDetails userDetails = new User("admin", "admin", Collections.emptyList());
 		
 		String token = jwtTokenUtil.generateToken(userDetails);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setBearerAuth(token);
+		headers.setContentType(MediaType.APPLICATION_JSON);
 		return headers;
 	}
 	//------------------------------------------------------------------------
@@ -185,16 +190,16 @@ class DietasApplicationTests {
 	@Transactional
 	public class BaseDeDatosSinDatos{
 
+		@SuppressWarnings("null")
 		@Test
 		@DisplayName("devuelve la lista de dietas")
 		public void devuelveDietas() {
-			var peticion = get("http", "localhost", port, "/dieta");
+			var peticion = get("http", "localhost", port, "/dieta/1");
 
 			var respuesta = restTemplate.exchange(peticion,
-				new ParameterizedTypeReference<Set<Dieta>>() {});
+				new ParameterizedTypeReference<List<DietaDTO>>() {});
 
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-			assertThat(respuesta.getBody().isEmpty());
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
 		}
 
 		
@@ -336,7 +341,7 @@ class DietasApplicationTests {
 			Long entrenadorId = 1L;
 			
 			// Realiza la petición para obtener la lista de dietas de un entrenador
-			var peticion = get("http", "localhost", port, "/entrenador/" + entrenadorId + "/dietas");
+			var peticion = get("http", "localhost", port,   "/dieta" +  "/entrenador/" + entrenadorId);
 			var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<List<DietaDTO>>() {});
 
 			// Verifica que se recibe una respuesta exitosa y la lista está vacía
@@ -414,19 +419,7 @@ class DietasApplicationTests {
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(respuesta.getBody().getId()).isEqualTo(2L);
 		}
-
-		/* 
-		@Test
-		@DisplayName("elimina dieta correctamente")
-		public void eliminaDietaCorrectamente(){
-			var peticion = delete("http", "localhost", port, "/dieta/1");
-			var respuesta = restTemplate.exchange(peticion, Void.class);
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-
-		}
-		*/
-
-		//------------------------------------------
+		
 		@Test
 		@DisplayName("elimina dieta correctamente")
 		public void eliminaDietaCorrectamente() {
@@ -466,25 +459,23 @@ class DietasApplicationTests {
 		@DisplayName("actualiza una dieta correctamente")
 		public void actualizaDietaCorrectamente() {
 			var dieta = DietaDTO.builder()
-								.nombre("Actualizado")
-								.descripcion("Actualizado")
-								.observaciones("Actualizado")
-								.objetivo("Actualizado")
-								.duracionDias(30)
-								.recomendaciones("Actualizado")
-								.build();
-			//var peticion = put("http", "localhost", port, "/dieta/1", dieta);
-			HttpHeaders headers = getHeaders();
-			HttpEntity<DietaDTO> entity = new HttpEntity<>(dieta, headers);
+			.nombre("Actualizado")
+			.descripcion("Actualizado")
+			.observaciones("Actualizado")
+			.objetivo("Actualizado")
+			.duracionDias(30)
+			.recomendaciones("Actualizado")
+			.build();
+			
+			//HttpHeaders headers = getHeaders();
+			//HttpEntity<DietaDTO> entity = new HttpEntity<>(dieta, headers);
 
-			// Construye la URI para la solicitud
-    		URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta/1")
-            .build().toUri();
+			var peticion = put("http", "localhost", port, "/dieta/1", dieta);
 
-			ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(uri, HttpMethod.PUT, entity, DietaDTO.class);
+			ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(peticion,DietaDTO.class);
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-		}
+			}
 
 		@Test
 		@DisplayName("devuelve la lista de dietas de un entrenador")

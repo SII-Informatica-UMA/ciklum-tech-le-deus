@@ -4,6 +4,7 @@ package ciklumtechledeus.entidades.controllers;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,14 +94,20 @@ public class DietaRest {
 
     @GetMapping("/{idDieta}")
     public ResponseEntity<DietaDTO> getDieta(@PathVariable Long idDieta) {
-        return this.servicio.getDieta(idDieta)
-                            .map(dieta -> ResponseEntity.ok(Mapper.toDietaDTO(dieta)))
-                            .orElseThrow(() -> new DietaNoExisteException("Dieta no encontrada"));
+        Optional<Dieta> dieta = servicio.getDieta(idDieta);
+
+        if (dieta.isPresent()) {
+            DietaDTO dietaDTO = Mapper.toDietaDTO(dieta.get());
+            return ResponseEntity.ok(dietaDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{idDieta}")
     public ResponseEntity<DietaDTO> updateDieta(@PathVariable Long idDieta,
                                                 @RequestBody DietaDTO dietaDTO) {
+        
         Dieta dieta = Mapper.toDieta(dietaDTO);
         dieta.setId(idDieta);
         Dieta actualizada = this.servicio.actualizarDieta(dieta);
@@ -110,7 +117,7 @@ public class DietaRest {
     @DeleteMapping("/{idDieta}")
     public ResponseEntity<Void> deleteDieta(@PathVariable Long idDieta) {
         this.servicio.deleteDietaById(idDieta);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }   
     
     @ExceptionHandler(DietaNoExisteException.class)
