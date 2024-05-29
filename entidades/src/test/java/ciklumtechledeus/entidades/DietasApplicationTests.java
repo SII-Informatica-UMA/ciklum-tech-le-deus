@@ -365,7 +365,6 @@ class DietasApplicationTests {
 			dieta2.setObservaciones("uso de batidos de proteina");
 			dieta2.setObjetivo("3500 kcal al dia");
 			dieta2.setDuracionDias(30);
-			dieta2.setEntrenadorId(1L);
 			repoDieta.save(dieta2);
 		}
 
@@ -445,9 +444,8 @@ class DietasApplicationTests {
             HttpEntity<DietaDTO> entity = new HttpEntity<>(dieta, headers);
 
             // Construye la URI para la solicitud
-            URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost/:" + port + "/dieta/1")
-            .build().toUri();
-			ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(uri, HttpMethod.PUT, entity, DietaDTO.class);	
+            var peticion = put("http", "localhost", port, "/dieta/2", dieta);
+			ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(peticion, DietaDTO.class);	
 			
 				assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			
