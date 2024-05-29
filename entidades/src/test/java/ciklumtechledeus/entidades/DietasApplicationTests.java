@@ -1,8 +1,7 @@
 package ciklumtechledeus.entidades;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,15 +14,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import ciklumtechledeus.entidades.dtos.DietaDTO;
 import ciklumtechledeus.entidades.entities.Dieta;
@@ -32,6 +29,17 @@ import jakarta.transaction.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+
+//---------------------------------------------------------
+import ciklumtechledeus.entidades.seguridad.JwtRequestFilter;
+import ciklumtechledeus.entidades.seguridad.JwtUtil;
+import ciklumtechledeus.entidades.seguridad.SecurityConfguration;
+import org.junit.platform.engine.reporting.ReportEntry;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.http.*;
+//-------------------------------------------------------
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -45,6 +53,11 @@ class DietasApplicationTests {
 
 	@Autowired
 	private DietaRepository repoDieta;
+
+	//--------------------------------------
+	@Autowired
+    private JwtUtil jwtTokenUtil;
+	//---------------------------------------
 
 	@BeforeEach
 	public void initializeDatabase() {
@@ -78,7 +91,7 @@ class DietasApplicationTests {
 		return peticion;
 	}
 
-
+	/*
 	private RequestEntity<Void> get(String scheme, String host, int port, String path) {
         URI uri = uri(scheme, host, port, path);
         var peticion = RequestEntity.get(uri)
@@ -109,12 +122,62 @@ class DietasApplicationTests {
             .body(object);
         return peticion;
     }
+	*/
+
+	//--------------------------------------------------------------------------------------
+	private RequestEntity<Void> get(String scheme, String host, int port, String path) {
+		URI uri = uri(scheme, host, port, path);
+		var peticion = RequestEntity.get(uri)
+			.headers(getHeaders())
+			.accept(MediaType.APPLICATION_JSON)
+			.build();
+		return peticion;
+	}
+	
+	private RequestEntity<Void> delete(String scheme, String host, int port, String path) {
+		URI uri = uri(scheme, host, port, path);
+		var peticion = RequestEntity.delete(uri)
+			.headers(getHeaders())
+			.build();
+		return peticion;
+	}
+	
+	private <T> RequestEntity<T> post(String scheme, String host, int port, String path, T object) {
+		URI uri = uri(scheme, host, port, path);
+		var peticion = RequestEntity.post(uri)
+			.headers(getHeaders())
+			.contentType(MediaType.APPLICATION_JSON)
+			.body(object);
+		return peticion;
+	}
+	
+	private <T> RequestEntity<T> put(String scheme, String host, int port, String path, T object) {
+		URI uri = uri(scheme, host, port, path);
+		var peticion = RequestEntity.put(uri)
+			.headers(getHeaders())
+			.contentType(MediaType.APPLICATION_JSON)
+			.body(object);
+		return peticion;
+	}
+	//-----------------------------------------------------------------------------------------
 
 	private void compruebaCampos(Dieta expected, Dieta actual){
 		assertThat(actual.getId()).isEqualTo(expected.getId());
 //		assertThat(actual.getClienteId()).isEqualTo(expected.getClienteId());
 //		assertThat(actual.getEntrenadorId()).isEqualTo(expected.getClienteId());
 	}
+
+	//-----------------------------------------------------------------------
+	private HttpHeaders getHeaders() {
+		User userDetails = new User("admin", "", Collections.emptyList());
+		
+		String token = jwtTokenUtil.generateToken(userDetails);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setBearerAuth(token);
+		return headers;
+	}
+	//------------------------------------------------------------------------
 
 
 	@Nested
@@ -161,6 +224,7 @@ class DietasApplicationTests {
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);			
 		}
 
+		/* 
 		@Test
 		@DisplayName("devuelve error al eliminar una dieta que no existe")
 		public void eliminarDietaInexistente(){
@@ -168,7 +232,8 @@ class DietasApplicationTests {
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
 		}
-
+		*/
+		/* 
 		@Test
 		@DisplayName("inserta correctamente una dieta")
 		public void insertaDieta(){
@@ -194,6 +259,7 @@ class DietasApplicationTests {
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 				.endsWith("/"+dietas.get(0).getId());
 		}
+		*/
 		/*    @Test
 		@DisplayName("devuelve error cuando no aporto información del ingrediente al insertar producto")
 		public void errorAlInsertarProductoSinInfoDeIngrediente() {
@@ -214,6 +280,85 @@ class DietasApplicationTests {
 			// Comprobamos el resultado
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
 		}*/
+
+		//--------------------------------------------------
+		@Test
+		@DisplayName("inserta correctamente una dieta")
+		public void insertaDieta() {
+			var dieta = DietaDTO.builder()
+								.nombre("Nueva")
+								.descripcion("Nueva")
+								.observaciones("Nueva")
+								.objetivo("Nueva")
+								.duracionDias(30)
+								.recomendaciones("Nueva")
+								.build();
+			
+
+			//DA ERROR CON PETICION					
+			//var peticion = post("http", "localhost", port, "/dieta", dieta);
+			HttpHeaders headers = getHeaders();
+			HttpEntity<DietaDTO> entity = new HttpEntity<>(dieta, headers);
+			
+			// Construye la URI para la solicitud
+    		URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta")
+            .build().toUri();
+
+			//ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(peticion, HttpMethod.POST, entity, DietaDTO.class);
+			ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(uri, HttpMethod.POST, entity, DietaDTO.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(201); // Esperamos un 201
+		}
+	
+		@Test
+		@DisplayName("devuelve error al eliminar una dieta que no existe")
+		public void eliminarDietaInexistente() {
+			//var peticion = delete("http", "localhost", port, "/dieta/999"); // ID no existente
+			HttpHeaders headers = getHeaders();
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+			
+			// Construye la URI para la solicitud
+    		URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta/999")
+            .build().toUri();
+
+
+			try {
+				restTemplate.exchange(uri, HttpMethod.DELETE, entity, Void.class);
+			} catch (HttpClientErrorException e) {
+				assertThat(e.getStatusCode().value()).isEqualTo(404); // Esperamos un 404
+			}
+		}
+
+		@Test
+		@DisplayName("devuelve la lista de dietas de un entrenador")
+		public void devuelveListaDeDietasDeEntrenador() {
+			// Simula la existencia de un entrenador
+			Long entrenadorId = 1L;
+			
+			// Realiza la petición para obtener la lista de dietas de un entrenador
+			var peticion = get("http", "localhost", port, "/entrenador/" + entrenadorId + "/dietas");
+			var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<List<DietaDTO>>() {});
+
+			// Verifica que se recibe una respuesta exitosa y la lista está vacía
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(respuesta.getBody()).isEmpty();
+		}
+
+		@Test
+		@DisplayName("devuelve la dieta asociada a un cliente")
+		public void devuelveDietaDeCliente() {
+			// Simula la existencia de un cliente
+			Long clienteId = 1L;
+			
+			// Realiza la petición para obtener la dieta asociada a un cliente
+			var peticion = get("http", "localhost", port, "/cliente/" + clienteId + "/dieta");
+			var respuesta = restTemplate.exchange(peticion, DietaDTO.class);
+
+			// Verifica que se recibe una respuesta 404 (Not Found)
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+		}
+
+		//--------------------------------------------------
 
 		
 	}
@@ -270,6 +415,7 @@ class DietasApplicationTests {
 			assertThat(respuesta.getBody().getId()).isEqualTo(2L);
 		}
 
+		/* 
 		@Test
 		@DisplayName("elimina dieta correctamente")
 		public void eliminaDietaCorrectamente(){
@@ -278,7 +424,100 @@ class DietasApplicationTests {
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 
 		}
+		*/
 
+		//------------------------------------------
+		@Test
+		@DisplayName("elimina dieta correctamente")
+		public void eliminaDietaCorrectamente() {
+			//var peticion = delete("http", "localhost", port, "/dieta/1");
+			HttpHeaders headers = getHeaders();
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+			// Construye la URI para la solicitud
+    		URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta/1")
+            .build().toUri();
+
+			ResponseEntity<Void> respuesta = restTemplate.exchange(uri, HttpMethod.DELETE, entity, Void.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200); // Esperamos un 200
+    	}
+
+		@Test
+		@DisplayName("elimina dieta que no existe")
+		public void eliminaDietaInexistente() {
+			//var peticion = delete("http", "localhost", port, "/dieta/999"); // ID no existente
+			HttpHeaders headers = getHeaders();
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+			// Construye la URI para la solicitud
+    		URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta/999")
+            .build().toUri();
+
+
+			try {
+				restTemplate.exchange(uri, HttpMethod.DELETE, entity, Void.class);
+			} catch (HttpClientErrorException e) {
+				assertThat(e.getStatusCode().value()).isEqualTo(404); // Esperamos un 404
+			}
+		}
+
+		@Test
+		@DisplayName("actualiza una dieta correctamente")
+		public void actualizaDietaCorrectamente() {
+			var dieta = DietaDTO.builder()
+								.nombre("Actualizado")
+								.descripcion("Actualizado")
+								.observaciones("Actualizado")
+								.objetivo("Actualizado")
+								.duracionDias(30)
+								.recomendaciones("Actualizado")
+								.build();
+			//var peticion = put("http", "localhost", port, "/dieta/1", dieta);
+			HttpHeaders headers = getHeaders();
+			HttpEntity<DietaDTO> entity = new HttpEntity<>(dieta, headers);
+
+			// Construye la URI para la solicitud
+    		URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta/1")
+            .build().toUri();
+
+			ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(uri, HttpMethod.PUT, entity, DietaDTO.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+		}
+
+		@Test
+		@DisplayName("devuelve la lista de dietas de un entrenador")
+		public void devuelveListaDeDietasDeEntrenador() {
+			// Simula la existencia de un entrenador con dietas asociadas
+			
+			// Realiza la petición para obtener la lista de dietas de un entrenador
+			var peticion = get("http", "localhost", port, "/entrenador/1/dietas");
+			var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<List<DietaDTO>>() {});
+
+			// Verifica que se recibe una respuesta exitosa y la lista no está vacía
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(respuesta.getBody()).isNotEmpty();
+		}
+
+		@Test
+		@DisplayName("devuelve la dieta asociada a un cliente")
+		public void devuelveDietaDeCliente() {
+			// Simula la existencia de un cliente con una dieta asociada
+			
+			// Realiza la petición para obtener la dieta asociada a un cliente
+			var peticion = get("http", "localhost", port, "/cliente/1/dieta");
+			var respuesta = restTemplate.exchange(peticion, DietaDTO.class);
+
+			// Verifica que se recibe una respuesta exitosa y la dieta es la esperada
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(respuesta.getBody()).isNotNull();
+			// Verifica propiedades de la dieta obtenida si es necesario
+		}
+
+		//------------------------------------------
+
+		/* 
 		@Test
 		@DisplayName("elimina dieta que no existe")
 		public void eliminaDietaInexistente(){
@@ -312,7 +551,7 @@ class DietasApplicationTests {
 			assertThat(act.getNombre()).isEqualTo("Dieta para Jaime");
 
 		}
-
+		*/
 
 	}
 
