@@ -12,6 +12,7 @@ import ciklumtechledeus.entidades.exceptions.AccesoProhibido;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -72,7 +73,7 @@ public class DietaRest {
         g.setEntrenadorId(idEntrenador);
         g = this.servicio.actualizarDieta(g);
         URI location = this.generadorUri(uriBuilder, g.getId());
-        return ResponseEntity.created(location).body(Mapper.toDietaDTO(g));
+        return ResponseEntity.ok(Mapper.toDietaDTO(g));
     }
 
     private URI generadorUri(UriComponentsBuilder uriBuilder, Long idDieta) {
