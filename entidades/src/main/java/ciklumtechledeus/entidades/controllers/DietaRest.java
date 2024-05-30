@@ -3,6 +3,7 @@ package ciklumtechledeus.entidades.controllers;
 
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -49,23 +50,7 @@ public class DietaRest {
         this.servicio = servicio;
     }
 
-    /*
-    @GetMapping
-    public List<DietaDTO> getDietas(@RequestParam(value = "entrenador",required = false) Long idEntrenador, @RequestParam(value = "cliente",required = false) Long idCliente) {
-      if (idEntrenador != null && idCliente != null) {
-         throw new IllegalArgumentException("Debes especificar exactamente un parametro de consulta: cliente o entrenador.");
-      } else if (idEntrenador == null && idCliente == null) {
-         throw new IllegalArgumentException("Debes especificar exactamente un parametro de consulta: cliente o entrenador.");
-      } else {
-         List<Dieta> dietas = null;
-         if (idEntrenador != null) {
-            dietas = this.servicio.dietasDeEntrenador(idEntrenador);
-         } else {
-            dietas = this.servicio.dietasDeCliente(idCliente);
-         }
-         return dietas.stream().map(Mapper::toDietaDTO).toList();
-      }
-    }*/
+    
     @GetMapping
     @PreAuthorize("hasRole('ENTRENADOR') or hasRole('CLIENTE')")
     public ResponseEntity<List<DietaDTO>> getDietas(
@@ -116,15 +101,18 @@ public class DietaRest {
                          .toUri();
     }
 
-    /*Revisar */
+    
     @PutMapping
+    @PreAuthorize("hasRole('ENTRENADOR')")
     public ResponseEntity<DietaDTO> asociarDieta(@RequestParam(value = "cliente", required = true) Long idCliente,
-                                                  @RequestBody DietaDTO dietaDTO) {
+                                                  @RequestBody DietaDTO nuevaDietaDTO) {
         try {
-            this.servicio.putDieta(dietaDTO.getId(), idCliente);
-            return this.servicio.getDieta(dietaDTO.getId())
-                                .map(dieta -> ResponseEntity.ok(Mapper.toDietaDTO(dieta)))
-                                .orElseThrow(() -> new DietaNoExisteException("Dieta no encontrada"));
+            if (nuevaDietaDTO.getNombre() == null || nuevaDietaDTO.getDescripcion() == null || nuevaDietaDTO.getObservaciones() == null
+            || nuevaDietaDTO.getObjetivo() == null || nuevaDietaDTO.getDuracionDias() == 0 || nuevaDietaDTO.getRecomendaciones() == null) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+        Dieta dietaActualizada = servicio.putDieta(nuevaDietaDTO.getId(), nuevaDietaDTO, idCliente);
+        return ResponseEntity.ok(Mapper.toDietaDTO(dietaActualizada));
         } catch (DietaNoExisteException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }

@@ -1,11 +1,15 @@
 package ciklumtechledeus.entidades.services;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ciklumtechledeus.entidades.dtos.DietaDTO;
 import ciklumtechledeus.entidades.entities.Dieta;
 import ciklumtechledeus.entidades.exceptions.DietaExistenteException;
 import ciklumtechledeus.entidades.exceptions.DietaNoExisteException;
@@ -25,20 +29,11 @@ public class DietaServicio {
     }
 
     public List<Dieta> dietasDeEntrenador(Long idEntrenador) {
-      return this.dietaRepo.findAllByEntrenadorId(idEntrenador);
+      return this.dietaRepo.findByEntrenadorId(idEntrenador);
    }
-
-   /*public boolean isEntrenadorOwner(Long idEntrenador, Dieta dieta){
-    
-    return dieta.getEntrenadorId() == idEntrenador;
-   }
-
-   public boolean isclienteOwner(Long idCliente, Dieta dieta){
-    return dieta.getClienteId().iterator().next() == idCliente;
-   }*/
 
    public List<Dieta> dietasDeCliente(Long idCliente) {
-      return this.dietaRepo.findAllByClienteId(idCliente);
+      return this.dietaRepo.findByClienteId(idCliente);
    }
 
    public Dieta postDieta(Dieta dieta){
@@ -65,14 +60,38 @@ public class DietaServicio {
      }
    }
 
-   public void putDieta(Long idDieta, Long idCliente) {
-      dietaRepo.findById(idDieta).ifPresentOrElse(dieta -> {
-         dieta.getClienteId().add(idCliente);
-         dietaRepo.save(dieta);
-     }, () -> {
-         throw new DietaNoExisteException("Dieta no encontrada");
-     });
-   }
+   public Dieta putDieta(Long idDieta, DietaDTO nuevaDietaDTO, Long idCliente) {
+        return dietaRepo.findById(idDieta)
+            .map(dieta -> {
+                // Actualiza todos los campos de la dieta con los valores de nuevaDietaDTO
+                dieta.setNombre(nuevaDietaDTO.getNombre());
+                dieta.setDescripcion(nuevaDietaDTO.getDescripcion());
+                dieta.setObservaciones(nuevaDietaDTO.getObservaciones());
+                dieta.setObjetivo(nuevaDietaDTO.getObjetivo());
+                dieta.setDuracionDias(nuevaDietaDTO.getDuracionDias());
+                dieta.setRecomendaciones(nuevaDietaDTO.getRecomendaciones());
+                // Actualiza cualquier otro campo que necesites
+
+                // Asocia el cliente a la dieta
+                if (dieta.getClienteId() == null) {
+                    dieta.setClienteId(new HashSet<>());
+                }
+                dieta.getClienteId().add(idCliente);
+
+                // Guarda la dieta actualizada
+                return dietaRepo.save(dieta);
+            })
+            .orElseThrow(() -> new DietaNoExisteException("Dieta no encontrada"));
+    }
     
 
 }
+
+  /*public boolean isEntrenadorOwner(Long idEntrenador, Dieta dieta){
+    
+    return dieta.getEntrenadorId() == idEntrenador;
+   }
+
+   public boolean isclienteOwner(Long idCliente, Dieta dieta){
+    return dieta.getClienteId().iterator().next() == idCliente;
+   }*/

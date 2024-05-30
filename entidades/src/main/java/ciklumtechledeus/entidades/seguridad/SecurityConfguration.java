@@ -32,7 +32,7 @@ public class SecurityConfguration {
             .csrf(cs -> cs.disable())
             .authorizeRequests(authorizeRequests ->
                     authorizeRequests
-                            //.requestMatchers("/dieta").hasAnyRole("ROLE_ENTRENADOR", "ROLE_CLIENTE")
+                    .requestMatchers("/dieta").hasAnyRole("ENTRENADOR", "CLIENTE")
                             .anyRequest().authenticated()
             )
             .sessionManagement(sessionManagement ->
