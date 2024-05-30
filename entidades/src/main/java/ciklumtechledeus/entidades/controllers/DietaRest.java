@@ -119,6 +119,7 @@ public class DietaRest {
     }
 
     @GetMapping("/{idDieta}")
+    @PreAuthorize("hasRole('ENTRENADOR') or hasRole('CLIENTE')")
     public ResponseEntity<DietaDTO> getDieta(@PathVariable Long idDieta) {
         Optional<Dieta> dieta = servicio.getDieta(idDieta);
 
@@ -147,9 +148,16 @@ public class DietaRest {
     }
 
     @DeleteMapping("/{idDieta}")
+    @PreAuthorize("hasRole('ENTRENADOR')")
     public ResponseEntity<Void> deleteDieta(@PathVariable Long idDieta) {
-        this.servicio.deleteDietaById(idDieta);
-        return ResponseEntity.ok().build();
+        try{
+            this.servicio.deleteDietaById(idDieta);
+            return ResponseEntity.ok().build();
+        }catch(DietaNoExisteException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }catch(AccesoProhibido e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
     }   
     
     @ExceptionHandler(DietaNoExisteException.class)

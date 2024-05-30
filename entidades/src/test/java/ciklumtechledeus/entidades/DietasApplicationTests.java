@@ -242,38 +242,34 @@ class DietasApplicationTests {
 		// FIN de GET/dieta ------------//
 		
 		@Test
-		@DisplayName("error al obtener una dieta concreto")
+		@DisplayName("error al obtener una dieta concreta porque no hay datos")
 		public void errorAlObtenerDietaConcreta(){
-			var peticion = get("http", "localhost", port, "/dieta/1");
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_CLIENTE"));
+			UserDetails userDetails = new User("adam", "admin", authorities);	
+			String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
 
-			var respuesta = restTemplate.exchange(peticion, 
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+			String url = "http://localhost:" + port + "/dieta/1";
+
+			var respuesta = restTemplate.exchange(url, HttpMethod.GET,entity,
 				new ParameterizedTypeReference<DietaDTO>() {});
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);	
 		}
 
-		@Test
-		@DisplayName("devuelve error al modificar una dieta que no existe")
-		public void modificarDietaInexistente(){
-			var dieta = DietaDTO.builder().id(1L)
-										.nombre("Jaime")
-										.descripcion("baja en caloria")
-										.observaciones("100 g proteinas necesarias")
-										.objetivo("2 kilos en un mes")
-										.duracionDias(30)
-										.recomendaciones("beber mucha agua")
-										.build();
-			
-			var peticion = put("http", "localhost", port, "/dieta/1", dieta);
-			var respuesta = restTemplate.exchange(peticion, Void.class);
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);			
-		}
+		//------------ PUT/ dieta-----------------------------
+		
 
+		
+		//----------------------- PUT/ dieta-----------------------------------
 
-		//--------------------------------------------------
+		//------------------DELETE /DIETA/ID DIETA
 		@Test
 		@DisplayName("devuelve error al eliminar una dieta que no existe")
 		public void eliminarDietaInexistente() {
 			//var peticion = delete("http", "localhost", port, "/dieta/999"); // ID no existente
+			
 			HttpHeaders headers = getHeaders();
 			HttpEntity<Void> entity = new HttpEntity<>(headers);
 			
@@ -288,6 +284,7 @@ class DietasApplicationTests {
 				assertThat(e.getStatusCode().value()).isEqualTo(404); // Esperamos un 404
 			}
 		}
+
 
 		@Test
 		@DisplayName("inserta correctamente una dieta")
@@ -564,13 +561,133 @@ class DietasApplicationTests {
 
 		}
 
-		
+		@Test
+		@DisplayName("devuelve error 404 cuando no hay dieta para actualizar ")
+		public void actualizarDietaNoExistente(){
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("entrenador", "password", authorities);
+			String token = jwtTokenUtil.generateToken(userDetails);
+			
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			
+			Long clienteId = 1L;
+			var dieta = DietaDTO.builder()
+								.id(1L)
+                                .nombre("Actualizado")
+                                .descripcion("Actualizado")
+                                .observaciones("Actualizado")
+                                .objetivo("Actualizado")
+                                .duracionDias(30)
+                                .recomendaciones("Actualizado")
+                                .build();
+			HttpEntity<?> entity = new HttpEntity<>(dieta, headers);
+
+			// Construye la URI para la solicitud PUT con un ID inexistente
+			URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta/9999")
+											.build().toUri();
+			
+			// Realiza la solicitud PUT
+			ResponseEntity<Void> respuesta = restTemplate.exchange(uri, HttpMethod.PUT, entity, Void.class);
+			
+			// Verifica que se devuelva el código de estado 404
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+
+		}
+
+		@Test
+		@DisplayName("devuelve error de accesso no autorizado para actualizar dieta existente")
+		public void putAccesoNoAutorizado(){
+			Long clienteId = 1L;
+			var dieta = DietaDTO.builder()
+								.id(1L)
+                                .nombre("Actualizado")
+                                .descripcion("Actualizado")
+                                .observaciones("Actualizado")
+                                .objetivo("Actualizado")
+                                .duracionDias(30)
+                                .recomendaciones("Actualizado")
+                                .build();
+			//No le añadimos los roles ni el token para que no autorice el acceso
+			//UserDetails userDetails = new User("jaime", "1234", authorities); 
+			//String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = getHeaders();
+			//headers.set("Authorization", "Bearer " + token);
+			HttpEntity<DietaDTO> entity = new HttpEntity<>(dieta, headers);
+			
+			String url = "http://localhost:" + port + "/dieta?cliente="+clienteId ;
+			// Construye la URI para la solicitud
+			var respuesta = restTemplate.exchange(url, HttpMethod.PUT, entity, DietaDTO.class);
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+		}
+
+
 
 		// ------------------- FIN put/dieta-------------------------
 		
+		// ------------------- DELETE/dieta/idDieta -------------------
+
 		@Test
-		@DisplayName("da error cuando inserta dieta existente")
-		public void insertaDietaExistente(){
+		@DisplayName("elimina dieta correctamente")
+		public void eliminaDietaCorrectamente() {
+			//var peticion = delete("http", "localhost", port, "/dieta/1");
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("jaime", "1234", authorities); 
+			String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = getHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+			// Construye la URI para la solicitud
+    		URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta/1")
+            .build().toUri();
+
+			ResponseEntity<Void> respuesta = restTemplate.exchange(uri, HttpMethod.DELETE, entity, Void.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200); // Esperamos un 200
+    	}
+
+		@Test
+		@DisplayName("devuelve error al intentar eliminar dieta que no existe")
+		public void eliminaDietaInexistente() {
+			//var peticion = delete("http", "localhost", port, "/dieta/999"); // ID no existente
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("jaime", "1234", authorities); 
+			String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = getHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+			// Construye la URI para la solicitud
+    		URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta/999")
+            .build().toUri();
+
+				var respuesta = restTemplate.exchange(uri, HttpMethod.DELETE, entity, Void.class);
+				assertThat(respuesta.getStatusCode().value()).isEqualTo(404); // Esperamos un 404
+		}
+
+		@Test
+		@DisplayName("devuelve error acceso no autorizado al intentar eliminar dieta sin rol de entrenador")
+		public void eliminaDietaSinAccesoNoAutorizado() {
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_CLIENTE"));
+			UserDetails userDetails = new User("jaime", "1234", authorities); 
+			String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = getHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+			URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta/1")
+									.build().toUri();
+
+			ResponseEntity<Void> respuesta = restTemplate.exchange(uri, HttpMethod.DELETE, entity, Void.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+		}
+		//------------------- FIN DELETE/dieta/idDieta-----------
+
+		@Test
+		@DisplayName("da error cuando inserta dieta sin rol de entrenador")
+		public void insertaDietaSinAccesoAutorizado(){
 			var dieta = DietaDTO.builder()
 						.nombre("Dieta 1")
 						.descripcion("Dieta para definición")
@@ -584,65 +701,80 @@ class DietasApplicationTests {
 		}
 
 		@Test
-		@DisplayName("devuelve una dieta recibiendo un id")
-		public void getDietaById(){
-			var peticion = get("http", "localhost", port, "/dieta/2");
-			var respuesta = restTemplate.exchange(peticion, DietaDTO.class);
+		@DisplayName("devuelve una dieta recibiendo un id con el entrenador asociado")
+		public void getDietaByIdyEntrenadorAsociado(){
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("adam", "admin", authorities);	
+			String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
+
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+			String url = "http://localhost:" + port + "/dieta/1?entrenador=1";
+
+			var respuesta = restTemplate.exchange(url, HttpMethod.GET,entity,
+				new ParameterizedTypeReference<DietaDTO>() {});
+			
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-			assertThat(respuesta.getBody().getId()).isEqualTo(2L);
+			assertThat(respuesta.getBody().getId()).isEqualTo(1L);
 		}
-		
+
 		@Test
-		@DisplayName("elimina dieta correctamente")
-		public void eliminaDietaCorrectamente() {
-			//var peticion = delete("http", "localhost", port, "/dieta/1");
-			HttpHeaders headers = getHeaders();
+		@DisplayName("devuelve una dieta recibiendo un id con el cliente asociado")
+		public void getDietaByIdyClienteAsociado(){
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_CLIENTE"));
+			UserDetails userDetails = new User("adam", "admin", authorities);	
+			String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
+
 			HttpEntity<Void> entity = new HttpEntity<>(headers);
+			String url = "http://localhost:" + port + "/dieta/1?cliente=1";
 
-			// Construye la URI para la solicitud
-    		URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta/1")
-            .build().toUri();
-
-			ResponseEntity<Void> respuesta = restTemplate.exchange(uri, HttpMethod.DELETE, entity, Void.class);
-
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(200); // Esperamos un 200
-    	}
+			var respuesta = restTemplate.exchange(url, HttpMethod.GET,entity,
+				new ParameterizedTypeReference<DietaDTO>() {});
+			
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(respuesta.getBody().getId()).isEqualTo(1L);
+		}
 
 		@Test
-		@DisplayName("elimina dieta que no existe")
-		public void eliminaDietaInexistente() {
-			//var peticion = delete("http", "localhost", port, "/dieta/999"); // ID no existente
-			HttpHeaders headers = getHeaders();
+		@DisplayName("devuelve ERROR al obtener una dieta recibiendo un id con el entrenador NO asociado")
+		public void getDietaByIdyEntrenadorNoAsociado(){
+			//List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			//UserDetails userDetails = new User("adam", "admin", authorities);	
+			//String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = new HttpHeaders();
+			//headers.set("Authorization", "Bearer " + token);
+
 			HttpEntity<Void> entity = new HttpEntity<>(headers);
+			String url = "http://localhost:" + port + "/dieta/2?entrenador=5";
 
-			// Construye la URI para la solicitud
-    		URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta/999")
-            .build().toUri();
-
-
-			try {
-				restTemplate.exchange(uri, HttpMethod.DELETE, entity, Void.class);
-			} catch (HttpClientErrorException e) {
-				assertThat(e.getStatusCode().value()).isEqualTo(404); // Esperamos un 404
-			}
+			var respuesta = restTemplate.exchange(url, HttpMethod.GET,entity,
+				new ParameterizedTypeReference<DietaDTO>() {});
+			
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+		
 		}
 
-		
-
-
-		//------------------------------------------
-
-		/* 
 		@Test
-		@DisplayName("elimina dieta que no existe")
-		public void eliminaDietaInexistente(){
-			var peticion = delete("http", "localhost", port, "/dieta/3");
-			var respuesta = restTemplate.exchange(peticion, void.class);
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+		@DisplayName("devuelve ERROR al obtener una dieta recibiendo un id con el cliente NO asociado")
+		public void getDietaByIdyClienteNoAsociado(){
+			//List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_CLIENTE"));
+			//UserDetails userDetails = new User("adam", "admin", authorities);	
+			//String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = new HttpHeaders();
+			//headers.set("Authorization", "Bearer " + token);
+
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+			String url = "http://localhost:" + port + "/dieta/2?cliente=7";
+
+			var respuesta = restTemplate.exchange(url, HttpMethod.GET,entity,
+				new ParameterizedTypeReference<DietaDTO>() {});
+			
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
 		}
 
-		
-		*/
 
 	}
 
