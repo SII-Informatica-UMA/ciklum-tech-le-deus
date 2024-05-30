@@ -76,17 +76,13 @@ public class DietaRest {
 
         if (idEntrenador != null && idCliente == null) {
             dietas = servicio.dietasDeEntrenador(idEntrenador);
-            //if(!servicio.isEntrenadorOwner(idEntrenador, dietas.get(0))){
-            //    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            //}
+            
             if(dietas.isEmpty()){
                 return ResponseEntity.notFound().build();
             }
         } else if (idCliente != null && idEntrenador == null) {
             dietas = servicio.dietasDeCliente(idCliente);
-            //if(!servicio.isclienteOwner(idCliente, dietas.get(0))){
-            //    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            //}
+            
             if(dietas.isEmpty()){
                 return ResponseEntity.notFound().build();
             }

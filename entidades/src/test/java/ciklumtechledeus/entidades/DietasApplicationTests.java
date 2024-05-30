@@ -425,33 +425,50 @@ class DietasApplicationTests {
 			assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 		}
 
-		/* 
+		 
 		@Test
 		@DisplayName("Acceso no autorizado para entrenador incorrecto")
 		public void accesoNoAutorizadoParaEntrenadorIncorrecto() {
-			// Simula un usuario con el rol de entrenador, pero con un ID diferente
-			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
-			UserDetails userDetails = new User("otroEntrenador", "1234", authorities);
-			String token = jwtTokenUtil.generateToken(userDetails);
-
+			// Simula un usuario sin el rol de entrenador 
+			// y no le añadimos seguridad  para que nos devuelva 403
+			//List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ENTRENADOR"));
+			//UserDetails userDetails = new User("otroEntrenador", "1234",Collections.emptyList());
+			//String token = jwtTokenUtil.generateToken(userDetails);
 			HttpHeaders headers = new HttpHeaders();
 			headers.set("Authorization", "Bearer " + token);
 			HttpEntity<Void> entity = new HttpEntity<>(headers);
 
 			// Supongamos que el ID del entrenador real es 1, pero estamos usando un usuario diferente
 			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
-					"/dieta?entrenador=3", HttpMethod.GET, entity, 
+					"/dieta?entrenador=1", HttpMethod.GET, entity, 
 					new ParameterizedTypeReference<List<DietaDTO>>() {}
 			);
 
 			// Verifica que la respuesta sea 403 Forbidden
 			assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-		}*/
+		}
 
+		@Test
+		@DisplayName("Acceso no autorizado para cliente incorrecto")
+		public void accesoNoAutorizadoParaClienteIncorrecto() {
+			// Simula un usuario sin el rol de cliente, 
+			// y no le añadimos seguridad ni el rol para que nos devuelva 403
+			//List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("CLIENTE"));
+			//UserDetails userDetails = new User("otroCliente", "1234", authorities);
+			//String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
 
+			// Supongamos que el ID del cliente real es 1, pero estamos usando un usuario diferente
+			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
+					"/dieta?cliente=1", HttpMethod.GET, entity, 
+					new ParameterizedTypeReference<List<DietaDTO>>() {}
+			);
 
-
-
+			// Verifica que la respuesta sea 403 Forbidden
+			assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+		}
 
 		//--------------- FIN GET/ dieta ----------------------------------
 

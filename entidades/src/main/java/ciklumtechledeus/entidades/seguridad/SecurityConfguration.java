@@ -28,19 +28,21 @@ public class SecurityConfguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(cs -> cs.disable())
-                .authorizeRequests(authorizeRequests ->
-                        authorizeRequests
-                                .anyRequest().authenticated()
-                )
-                .sessionManagement(sessionManagement ->
-                        sessionManagement
-                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+    http
+            .csrf(cs -> cs.disable())
+            .authorizeRequests(authorizeRequests ->
+                    authorizeRequests
+                            //.requestMatchers("/dieta").hasAnyRole("ROLE_ENTRENADOR", "ROLE_CLIENTE")
+                            .anyRequest().authenticated()
+            )
+            .sessionManagement(sessionManagement ->
+                    sessionManagement
+                            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            );
+    http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    return http.build();
+}
+
 
     public static Optional<UserDetails> getAuthenticatedUser() {
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
