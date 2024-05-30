@@ -29,7 +29,7 @@ public class DietaServicio {
    }
 
    public List<Dieta> dietasDeCliente(Long idCliente) {
-      return this.dietaRepo.findByClienteId(idCliente);
+      return this.dietaRepo.findAllByClienteId(idCliente);
    }
 
    public Dieta postDieta(Dieta dieta){

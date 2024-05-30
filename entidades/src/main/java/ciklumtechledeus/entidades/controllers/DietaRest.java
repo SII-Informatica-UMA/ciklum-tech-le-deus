@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import ciklumtechledeus.entidades.exceptions.AccesoProhibido;
 
@@ -48,6 +49,7 @@ public class DietaRest {
         this.servicio = servicio;
     }
 
+    /*
     @GetMapping
     public List<DietaDTO> getDietas(@RequestParam(value = "entrenador",required = false) Long idEntrenador, @RequestParam(value = "cliente",required = false) Long idCliente) {
       if (idEntrenador != null && idCliente != null) {
@@ -63,6 +65,34 @@ public class DietaRest {
          }
          return dietas.stream().map(Mapper::toDietaDTO).toList();
       }
+    }*/
+    @GetMapping
+    @PreAuthorize("hasRole('ENTRENADOR') or hasRole('CLIENTE')")
+    public ResponseEntity<List<DietaDTO>> getDietas(
+            @RequestParam(value = "entrenador", required = false) Long idEntrenador,
+            @RequestParam(value = "cliente", required = false) Long idCliente) {
+
+        List<Dieta> dietas;
+
+        if (idEntrenador != null && idCliente == null) {
+            dietas = servicio.dietasDeEntrenador(idEntrenador);
+            if(dietas.isEmpty()){
+                return ResponseEntity.notFound().build();
+            }
+        } else if (idCliente != null && idEntrenador == null) {
+            dietas = servicio.dietasDeCliente(idCliente);
+            if(dietas.isEmpty()){
+                return ResponseEntity.notFound().build();
+            }
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<DietaDTO> dietaDTOs = dietas.stream()
+                                         .map(Mapper::toDietaDTO)
+                                         .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dietaDTOs);
     }
 
     @PostMapping
@@ -111,11 +141,17 @@ public class DietaRest {
     }
 
     @PutMapping("/{idDieta}")
+    @PreAuthorize("hasRole('ENTRENADOR')")
     public ResponseEntity<DietaDTO> updateDieta(@PathVariable Long idDieta,
                                                 @RequestBody DietaDTO dietaDTO) {
         
+        //Optional<Dieta> g = servicio.getDieta(idDieta);
+        //Dieta g1 = g.get();
+
         Dieta dieta = Mapper.toDieta(dietaDTO);
+        //dieta.setClienteId(g1.getClienteId());
         dieta.setId(idDieta);
+        //dieta.setEntrenadorId(idDieta);*/
         Dieta actualizada = this.servicio.actualizarDieta(dieta);
         return ResponseEntity.ok(Mapper.toDietaDTO(actualizada));
     }

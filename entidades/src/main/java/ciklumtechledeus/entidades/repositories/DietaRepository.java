@@ -38,8 +38,8 @@ public interface DietaRepository extends JpaRepository<Dieta, Long> {
    
     // Define una consulta JPQL que selecciona todas las entidades Dieta (d) 
     // donde el valor idCliente es un miembro del conjunto d.clienteId.
-    @Query("SELECT d FROM Dieta d WHERE :idCliente MEMBER OF d.clienteId")
-    List<Dieta> findAllByClienteId(@Param("idCliente") Long idCliente);
+   
+    List<Dieta> findAllByClienteId( Long idCliente);
 
     List<Dieta> findAllByNombre(String nombre);
 

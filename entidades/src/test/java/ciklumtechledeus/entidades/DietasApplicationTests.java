@@ -178,48 +178,67 @@ class DietasApplicationTests {
 	@Transactional
 	public class BaseDeDatosSinDatos{
 
-		/*
+		//----GET /dieta --------------------//
 		@Test
-			@DisplayName("devuelve una lista de dietas introduciendo id de cliente en una base de datos vacia")
-			public void devuelveListaDietasCliente() {
-				var peticion = RequestEntity.get("http://localhost:"+ port+ "/rutina?cliente=1")
-						.headers(getHeaders())
-						.build();
+		@DisplayName("Error en solicitud por introducir ambos parámetros para obtener dieta en Base de datos vacia")
+		public void errorPorAmbosParametros() {
+			//String token = obtenerTokenConRol("ENTRENADOR");
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("jaime", "1234", authorities); 
+    		String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-				var respuesta = restTemplate.exchange(peticion,
-						new ParameterizedTypeReference<List<DietaDTO>>() {});
+			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
+					"/dieta?entrenador=1&cliente=1", HttpMethod.GET, entity, 
+					new ParameterizedTypeReference<List<DietaDTO>>() {}
+			);
 
-				assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-				assertThat(respuesta.getBody().size()).isEqualTo(0);
-			}
-		
-		
-			@Test
-			@DisplayName("devuelve una lista de dietas introduciendo id de entrenador en una base de datos vacia")
-			public void devuelveListaDietasEntrenador() {
-				var peticion = RequestEntity.get("http://localhost:"+ port+ "/rutina?entrenador=1")
-						.headers(getHeaders())
-						.build();
-
-				var respuesta = restTemplate.exchange(peticion,
-						new ParameterizedTypeReference<List<DietaDTO>>() {});
-
-				assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-				assertThat(respuesta.getBody().size()).isEqualTo(0);
-			}*/
-
-		@SuppressWarnings("null")
-		@Test
-		@DisplayName("devuelve la lista de dietas")
-		public void devuelveDietas() {
-			var peticion = get("http", "localhost", port, "/dieta/1");
-
-			var respuesta = restTemplate.exchange(peticion,
-				new ParameterizedTypeReference<List<DietaDTO>>() {});
-
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+			assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 		}
 
+		@Test
+		@DisplayName("devuelve NOT FOUND cuando no hay dietas de un entrenador en una base de datos vacia")
+		public void devuelveListaDeDietasDeEntrenador() {
+			// Simula la existencia de un entrenador
+			Long entrenadorId = 1L;
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("admin", "admin", authorities);	
+			String token = jwtTokenUtil.generateToken(userDetails);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+			String url = "http://localhost:" + port + "/dieta?entrenador=" + entrenadorId;
+			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
+				url, HttpMethod.GET, entity, new ParameterizedTypeReference<List<DietaDTO>>() {}
+			);
+			// Verifica que se recibe NOT FOUND y la lista está vacía
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+			
+		}
+
+		@Test
+		@DisplayName("devuelve NOT FOUND cuando no hay dieta asociada a un cliente")
+		public void devuelveDietaDeCliente() {
+			Long clienteId = 1L;
+			UserDetails userDetails = new User("admin", "admin", Collections.emptyList());	
+			String token = jwtTokenUtil.generateToken(userDetails);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
+
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+			String url = "http://localhost:" + port + "/dieta?cliente=" + clienteId;
+
+			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
+					url, HttpMethod.GET, entity, new ParameterizedTypeReference<List<DietaDTO>>() {});
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+
+		}
+		// FIN de GET/dieta ------------//
 		
 		@Test
 		@DisplayName("error al obtener una dieta concreto")
@@ -242,68 +261,12 @@ class DietasApplicationTests {
 										.duracionDias(30)
 										.recomendaciones("beber mucha agua")
 										.build();
+			
 			var peticion = put("http", "localhost", port, "/dieta/1", dieta);
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);			
 		}
 
-		/* 
-		@Test
-		@DisplayName("devuelve error al eliminar una dieta que no existe")
-		public void eliminarDietaInexistente(){
-			var peticion = delete("http", "localhost", port, "/dieta/1");
-			var respuesta = restTemplate.exchange(peticion, Void.class);
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
-		}
-		*/
-
-		/* 
-		@Test
-		@DisplayName("inserta correctamente una dieta")
-		public void insertaDieta(){
-			var dieta = DietaDTO.builder()
-						.id(1L)
-						.nombre("Jaime")
-						.descripcion("baja en caloria")
-						.observaciones("100 g proteinas necesarias")
-						.objetivo("2 kilos en un mes")
-						.duracionDias(30)
-						.recomendaciones("beber mucha agua")
-						.build();
-			var peticion = post("http", "localhost", port, "/dieta/1", dieta);
-			var respuesta = restTemplate.exchange(peticion, Void.class);
-
-			//Comprobamos el resultado
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
-			assertThat(respuesta.getHeaders().get("Location").get(0))
-				.startsWith("http://localhost:"+port+"/dieta");
-			
-			List<Dieta> dietas = repoDieta.findAll();
-			assertThat(dietas).hasSize(1);
-			assertThat(respuesta.getHeaders().get("Location").get(0))
-				.endsWith("/"+dietas.get(0).getId());
-		}
-		*/
-		/*    @Test
-		@DisplayName("devuelve error cuando no aporto información del ingrediente al insertar producto")
-		public void errorAlInsertarProductoSinInfoDeIngrediente() {
-
-			var ingrediente = IngredienteDTO.builder().build();
-			
-			// Preparamos el producto a insertar
-			var producto = ProductoDTO.builder()
-					.nombre("Hamburguesa")
-					.ingredientes(Collections.singleton(ingrediente))
-					.build();
-			// Preparamos la petición con el ingrediente dentro
-			var peticion = post("http", "localhost",port, "/productos", producto);
-
-			// Invocamos al servicio REST 
-			var respuesta = restTemplate.exchange(peticion,Void.class);
-
-			// Comprobamos el resultado
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
-		}*/
 
 		//--------------------------------------------------
 		@Test
@@ -360,45 +323,7 @@ class DietasApplicationTests {
 
 		
 
-		@Test
-		@DisplayName("devuelve la lista de dietas de un entrenador")
-		public void devuelveListaDeDietasDeEntrenador() {
-			// Simula la existencia de un entrenador
-			Long entrenadorId = 1L;
-			UserDetails userDetails = new User("admin", "admin", Collections.emptyList());	
-			String token = jwtTokenUtil.generateToken(userDetails);
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.set("Authorization", "Bearer " + token);
-			HttpEntity<Void> entity = new HttpEntity<>(headers);
-			String url = "http://localhost:" + port + "/dieta?entrenador=" + entrenadorId;
-			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
-				url, HttpMethod.GET, entity, new ParameterizedTypeReference<List<DietaDTO>>() {}
-			);
-			// Verifica que se recibe una respuesta exitosa y la lista está vacía
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-			assertThat(respuesta.getBody()).isEmpty();
-		}
-
-		@Test
-		@DisplayName("devuelve la dieta asociada a un cliente")
-		public void devuelveDietaDeCliente() {
-			Long clienteId = 1L;
-			UserDetails userDetails = new User("admin", "admin", Collections.emptyList());	
-			String token = jwtTokenUtil.generateToken(userDetails);
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.set("Authorization", "Bearer " + token);
-
-			HttpEntity<Void> entity = new HttpEntity<>(headers);
-			String url = "http://localhost:" + port + "/dieta?cliente=" + clienteId;
-
-			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
-					url, HttpMethod.GET, entity, new ParameterizedTypeReference<List<DietaDTO>>() {});
-
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-			assertThat(respuesta.getBody()).isEmpty();
-		}
+		
 
 		//--------------------------------------------------
 
@@ -421,6 +346,7 @@ class DietasApplicationTests {
 			dieta1.setObservaciones("15000 pasos diarios");
 			dieta1.setObjetivo("1800 kcal al dia");
 			dieta1.setDuracionDias(30);
+			dieta1.setEntrenadorId(1L);
 			dieta1.setClienteId(set);
 			repoDieta.save(dieta1);
 
@@ -434,6 +360,74 @@ class DietasApplicationTests {
 			dieta2.setEntrenadorId(1L);
 			repoDieta.save(dieta2);
 		}
+		
+		//----------------- GET /dieta --------------------------------
+		@Test
+		@DisplayName("Error en solicitud por introducir ambos parámetros para obtener dieta en Base de datos con datos")
+		public void errorPorAmbosParametros() {
+			//String token = obtenerTokenConRol("ENTRENADOR");
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("jaime", "1234", authorities); 
+    		String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
+					"/dieta?entrenador=1&cliente=1", HttpMethod.GET, entity, 
+					new ParameterizedTypeReference<List<DietaDTO>>() {}
+			);
+
+			assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		}
+
+		@Test
+		@DisplayName("devuelve la lista de dietas de un entrenador en una base de datos con datos")
+		public void devuelveListaDeDietasDeEntrenador() {
+			// Simula la existencia de un entrenador
+			Long entrenadorId = 1L;
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("jaime", "admin", authorities);	
+			String token = jwtTokenUtil.generateToken(userDetails);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+			String url = "http://localhost:" + port + "/dieta?entrenador=" + entrenadorId;
+			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
+				url, HttpMethod.GET, entity, new ParameterizedTypeReference<List<DietaDTO>>() {}
+			);
+			// Verifica que se recibe una respuesta exitosa y la lista está vacía
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(respuesta.getBody()).isNotEmpty();
+		}
+
+		@Test
+		@DisplayName("devuelve la lista de dietas de un cliente en una base de datos con datos")
+		public void devuelveListaDeDietasDeCliente() {
+			// Simula la existencia de un entrenador
+			Long clienteId = 1L;
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_CLIENTE"));
+			UserDetails userDetails = new User("jaime", "admin", authorities);	
+			String token = jwtTokenUtil.generateToken(userDetails);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+			String url = "http://localhost:" + port + "/dieta?cliente=" + clienteId;
+			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
+				url, HttpMethod.GET, entity, new ParameterizedTypeReference<List<DietaDTO>>() {}
+			);
+			// Verifica que se recibe una respuesta exitosa y la lista está vacía
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(respuesta.getBody()).isNotEmpty();
+		}
+
+
+
+
+
+		//--------------- FIN GET/ dieta ----------------------------------
 
 		//Revisar
 		@Test
@@ -498,7 +492,7 @@ class DietasApplicationTests {
 		@Test
         @DisplayName("actualiza una dieta correctamente")
         public void putDietaCorrectamente() {
-            var dieta = Dieta.builder()
+            var dieta = DietaDTO.builder()
 								.id(1L)
                                 .nombre("Actualizado")
                                 .descripcion("Actualizado")
@@ -507,54 +501,22 @@ class DietasApplicationTests {
                                 .duracionDias(30)
                                 .recomendaciones("Actualizado")
                                 .build();
-            var peticion = put("http", "localhost", port, "/dieta/1", dieta);
-            var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<DietaDTO>(){});	
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("jaime", "1234", authorities); 
+			String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = getHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<DietaDTO> entity = new HttpEntity<>(dieta, headers);
 			
+			// Construye la URI para la solicitud
+			var peticion = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta/1")
+                                       .queryParam("entrenador", 1)
+                                       .build().toUri();
+			var respuesta = restTemplate.exchange(peticion, HttpMethod.PUT, entity, DietaDTO.class);
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(repoDieta.findById(1L).get().getNombre()).isEqualTo("Actualizado");
-            
         }
 
-		@Test
-		@DisplayName("devuelve la lista de dietas de un entrenador")
-		public void devuelveListaDeDietasDeEntrenador() {
-			// Simula la existencia de un entrenador con dietas asociadas
-			Long entrenadorId = 1L;
-			UserDetails userDetails = new User("admin", "admin", Collections.emptyList());
-			String token = jwtTokenUtil.generateToken(userDetails);
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.set("Authorization", "Bearer "+token);
-			HttpEntity<Void> entity = new HttpEntity<>(headers);
-			String url = "http://localhost:"+port+"/dieta?entrenador="+entrenadorId;
-			// Realiza la petición para obtener la lista de dietas de un entrenador
-			var respuesta = restTemplate.exchange(url,HttpMethod.GET,entity, new ParameterizedTypeReference<List<DietaDTO>>() {});
-
-			// Verifica que se recibe una respuesta exitosa y la lista no está vacía
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-			assertThat(respuesta.getBody()).isNotEmpty();
-		}
-
-		@Test
-		@DisplayName("devuelve la dieta asociada a un cliente")
-		public void devuelveDietaDeCliente() {
-			// Simula la existencia de un cliente con una dieta asociada
-			Long clienteId = 1L;
-			UserDetails userDetails = new User("admin", "admin", Collections.emptyList());
-			String token = jwtTokenUtil.generateToken(userDetails);
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.set("Authorization", "Bearer "+token);
-			HttpEntity<Void> entity = new HttpEntity<>(headers);
-			// Realiza la petición para obtener la dieta asociada a un cliente
-			String url = "http://localhost:" + port + "/dieta?cliente=" + clienteId;
-			var respuesta  = restTemplate.exchange(url, HttpMethod.GET, entity, new ParameterizedTypeReference<List<DietaDTO>>() {});
-
-			// Verifica que se recibe una respuesta exitosa y la dieta es la esperada
-			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-			assertThat(respuesta.getBody()).isNotNull();
-			// Verifica propiedades de la dieta obtenida si es necesario
-		}
 
 		//------------------------------------------
 
