@@ -41,6 +41,7 @@ import ciklumtechledeus.entidades.seguridad.SecurityConfguration;
 import ciklumtechledeus.entidades.services.DietaServicio;
 
 import org.junit.platform.engine.reporting.ReportEntry;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -255,6 +256,7 @@ class DietasApplicationTests {
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
 		}
 		*/
+
 		/* 
 		@Test
 		@DisplayName("inserta correctamente una dieta")
@@ -335,21 +337,27 @@ class DietasApplicationTests {
 								.recomendaciones("Nueva")
 								.build();
 			
-
-			UserDetails userDetails = new User("jaime", "1234", Collections.emptyList()); 
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("jaime", "1234", authorities); 
     		String token = jwtTokenUtil.generateToken(userDetails);
 			HttpHeaders headers = getHeaders();
 			headers.set("Authorization", "Bearer " + token);
-			HttpEntity<?> entity = new HttpEntity<>(dieta, headers);
+			HttpEntity<DietaNuevaDTO> entity = new HttpEntity<>(dieta, headers);
 			
 			// Construye la URI para la solicitud
-    		URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta?entrenador=1")
-        .build().toUri();
-			ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(uri, HttpMethod.POST, entity, DietaDTO.class);
+			var peticion = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta")
+                                       .queryParam("entrenador", 1)
+                                       .build().toUri();
+									   
+			var respuesta = restTemplate.exchange(peticion, HttpMethod.POST, entity, DietaDTO.class);
 
-			assertThat(ResponseEntity.ok(respuesta)); // Esperamos un 201
+		
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(201); // Esperamos un 201
 		}
-	
+		//URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta?entrenador=1")
+        	//.build().toUri();
+			//ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(uri, HttpMethod.POST, entity, DietaDTO.class);
+
 		
 
 		@Test

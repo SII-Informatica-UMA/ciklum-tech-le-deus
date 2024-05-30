@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,15 +66,16 @@ public class DietaRest {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ENTRENADOR')")
     public ResponseEntity<DietaDTO> createDieta(@RequestParam(value = "entrenador", required = true) Long idEntrenador,
                                                 @RequestBody DietaNuevaDTO dietaNuevoDTO,
                                                 UriComponentsBuilder uriBuilder) {
         Dieta g = Mapper.toDietaNueva(dietaNuevoDTO);
-        g.setId(null);
+        g.setId(g.getId());
         g.setEntrenadorId(idEntrenador);
-        g = this.servicio.actualizarDieta(g);
+        g = this.servicio.postDieta(g);
         URI location = this.generadorUri(uriBuilder, g.getId());
-        return ResponseEntity.ok(Mapper.toDietaDTO(g));
+        return ResponseEntity.created(location).body(Mapper.toDietaDTO(g));
     }
 
     private URI generadorUri(UriComponentsBuilder uriBuilder, Long idDieta) {

@@ -32,6 +32,10 @@ public class DietaServicio {
       return this.dietaRepo.findByClienteId(idCliente);
    }
 
+   public Dieta postDieta(Dieta dieta){
+    return dietaRepo.save(dieta);
+   }
+
    public Dieta actualizarDieta(Dieta dieta) {
       if (dietaRepo.existsById(dieta.getId())) {
           return dietaRepo.save(dieta);
