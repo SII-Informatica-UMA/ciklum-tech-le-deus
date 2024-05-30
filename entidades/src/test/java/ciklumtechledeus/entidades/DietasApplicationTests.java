@@ -362,24 +362,7 @@ class DietasApplicationTests {
 		}
 		
 		//----------------- GET /dieta --------------------------------
-		@Test
-		@DisplayName("Error en solicitud por introducir ambos parámetros para obtener dieta en Base de datos con datos")
-		public void errorPorAmbosParametros() {
-			//String token = obtenerTokenConRol("ENTRENADOR");
-			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
-			UserDetails userDetails = new User("jaime", "1234", authorities); 
-    		String token = jwtTokenUtil.generateToken(userDetails);
-			HttpHeaders headers = new HttpHeaders();
-			headers.set("Authorization", "Bearer " + token);
-			HttpEntity<Void> entity = new HttpEntity<>(headers);
-
-			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
-					"/dieta?entrenador=1&cliente=1", HttpMethod.GET, entity, 
-					new ParameterizedTypeReference<List<DietaDTO>>() {}
-			);
-
-			assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-		}
+		
 
 		@Test
 		@DisplayName("devuelve la lista de dietas de un entrenador en una base de datos con datos")
@@ -422,6 +405,49 @@ class DietasApplicationTests {
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(respuesta.getBody()).isNotEmpty();
 		}
+
+		@Test
+		@DisplayName("Error en solicitud por introducir ambos parámetros para obtener dieta en Base de datos con datos")
+		public void errorPorAmbosParametros() {
+			//String token = obtenerTokenConRol("ENTRENADOR");
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("jaime", "1234", authorities); 
+    		String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
+					"/dieta?entrenador=1&cliente=1", HttpMethod.GET, entity, 
+					new ParameterizedTypeReference<List<DietaDTO>>() {}
+			);
+
+			assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		}
+
+		/* 
+		@Test
+		@DisplayName("Acceso no autorizado para entrenador incorrecto")
+		public void accesoNoAutorizadoParaEntrenadorIncorrecto() {
+			// Simula un usuario con el rol de entrenador, pero con un ID diferente
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("otroEntrenador", "1234", authorities);
+			String token = jwtTokenUtil.generateToken(userDetails);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+			// Supongamos que el ID del entrenador real es 1, pero estamos usando un usuario diferente
+			ResponseEntity<List<DietaDTO>> respuesta = restTemplate.exchange(
+					"/dieta?entrenador=3", HttpMethod.GET, entity, 
+					new ParameterizedTypeReference<List<DietaDTO>>() {}
+			);
+
+			// Verifica que la respuesta sea 403 Forbidden
+			assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+		}*/
+
 
 
 

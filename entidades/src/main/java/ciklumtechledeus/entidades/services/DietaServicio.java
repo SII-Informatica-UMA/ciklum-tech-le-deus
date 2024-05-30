@@ -28,6 +28,14 @@ public class DietaServicio {
       return this.dietaRepo.findAllByEntrenadorId(idEntrenador);
    }
 
+   public boolean isEntrenadorOwner(Long idEntrenador, Dieta dieta){
+    return dieta.getEntrenadorId() == idEntrenador;
+   }
+
+   public boolean isclienteOwner(Long idCliente, Dieta dieta){
+    return dieta.getClienteId().iterator().next() == idCliente;
+   }
+
    public List<Dieta> dietasDeCliente(Long idCliente) {
       return this.dietaRepo.findAllByClienteId(idCliente);
    }
