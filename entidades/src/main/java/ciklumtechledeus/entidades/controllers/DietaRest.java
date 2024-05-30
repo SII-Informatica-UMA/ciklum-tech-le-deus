@@ -85,9 +85,15 @@ public class DietaRest {
     @PostMapping
     @PreAuthorize("hasRole('ENTRENADOR')")
     public ResponseEntity<DietaDTO> createDieta(@RequestParam(value = "entrenador", required = true) Long idEntrenador,
-                                                @RequestBody DietaNuevaDTO dietaNuevoDTO,
+                                                @RequestBody DietaNuevaDTO nuevaDietaDTO,
                                                 UriComponentsBuilder uriBuilder) {
-        Dieta g = Mapper.toDietaNueva(dietaNuevoDTO);
+        
+        
+            if (nuevaDietaDTO.getNombre() == null || nuevaDietaDTO.getDescripcion() == null || nuevaDietaDTO.getObservaciones() == null
+            || nuevaDietaDTO.getObjetivo() == null || nuevaDietaDTO.getDuracionDias() == 0 || nuevaDietaDTO.getRecomendaciones() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }                                      
+        Dieta g = Mapper.toDietaNueva(nuevaDietaDTO);
         g.setId(g.getId());
         g.setEntrenadorId(idEntrenador);
         g = this.servicio.postDieta(g);

@@ -287,7 +287,7 @@ class DietasApplicationTests {
 
 
 		@Test
-		@DisplayName("inserta correctamente una dieta")
+		@DisplayName("inserta correctamente una dieta en una base de datos vacia")
 		public void insertaDieta() {
 			var dieta = DietaNuevaDTO.builder()
 								.nombre("Nueva")
@@ -685,6 +685,59 @@ class DietasApplicationTests {
 		}
 		//------------------- FIN DELETE/dieta/idDieta-----------
 
+		//------------- POST / DIETA
+
+		@Test
+		@DisplayName("inserta correctamente una dieta")
+		public void insertaDieta() {
+			var dieta = DietaNuevaDTO.builder()
+								.nombre("Nueva")
+								.descripcion("Nueva")
+								.observaciones("Nueva")
+								.objetivo("Nueva")
+								.duracionDias(30)
+								.recomendaciones("Nueva")
+								.build();
+			
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("jaime", "1234", authorities); 
+    		String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = getHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<DietaNuevaDTO> entity = new HttpEntity<>(dieta, headers);
+			
+			// Construye la URI para la solicitud
+			var peticion = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta")
+                                       .queryParam("entrenador", 1)
+                                       .build().toUri();
+									   
+			var respuesta = restTemplate.exchange(peticion, HttpMethod.POST, entity, DietaDTO.class);
+
+		
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(201); // Esperamos un 201
+		}
+
+		@Test
+		@DisplayName("devuelve BAD REQUEST al intentar crear dieta vacia ")
+		public void crearDietaVaciaEntrenador(){
+			Long clienteId=5L;
+			var dieta = DietaDTO.builder()
+								.build();
+			List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ENTRENADOR"));
+			UserDetails userDetails = new User("jaime", "1234", authorities); 
+			String token = jwtTokenUtil.generateToken(userDetails);
+			HttpHeaders headers = getHeaders();
+			headers.set("Authorization", "Bearer " + token);
+			HttpEntity<DietaDTO> entity = new HttpEntity<>(dieta, headers);
+			
+			String url = "http://localhost:" + port + "/dieta?cliente="+clienteId ;
+			// Construye la URI para la solicitud
+			var respuesta = restTemplate.exchange(url, HttpMethod.PUT, entity, DietaDTO.class);
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(400);
+
+		}
+
+
 		@Test
 		@DisplayName("da error cuando inserta dieta sin rol de entrenador")
 		public void insertaDietaSinAccesoAutorizado(){
@@ -699,6 +752,9 @@ class DietasApplicationTests {
 			
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
 		}
+
+
+		//-----------------------FIN POST/dieta------------------------
 
 		@Test
 		@DisplayName("devuelve una dieta recibiendo un id con el entrenador asociado")
