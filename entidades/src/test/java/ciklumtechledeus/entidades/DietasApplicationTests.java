@@ -315,15 +315,6 @@ class DietasApplicationTests {
 		
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(201); // Esperamos un 201
 		}
-		//URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/dieta?entrenador=1")
-        	//.build().toUri();
-			//ResponseEntity<DietaDTO> respuesta = restTemplate.exchange(uri, HttpMethod.POST, entity, DietaDTO.class);
-
-		
-
-		
-
-		//--------------------------------------------------
 
 		
 	}

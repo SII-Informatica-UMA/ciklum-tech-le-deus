@@ -86,12 +86,3 @@ public class DietaServicio {
     
 
 }
-
-  /*public boolean isEntrenadorOwner(Long idEntrenador, Dieta dieta){
-    
-    return dieta.getEntrenadorId() == idEntrenador;
-   }
-
-   public boolean isclienteOwner(Long idCliente, Dieta dieta){
-    return dieta.getClienteId().iterator().next() == idCliente;
-   }*/
