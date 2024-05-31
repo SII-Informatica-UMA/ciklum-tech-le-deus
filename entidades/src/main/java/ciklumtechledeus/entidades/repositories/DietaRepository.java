@@ -16,6 +16,21 @@ public interface DietaRepository extends JpaRepository<Dieta, Long> {
     
     @Modifying
     @Transactional
+    @Query("INSERT INTO Dieta(nombre, descripcion, observaciones, objetivo, duracionDias, alimentos, recomendaciones, entrenadorId, clienteId) VALUES (:nombre, :descripcion, :observaciones, :objetivo, :duracionDias, :alimentos, :recomendaciones, :entrenadorId, :clienteId)")
+    void insertDieta(@Param("nombre") String nombre, @Param("descripcion") String descripcion, @Param("observaciones") String observaciones, @Param("objetivo") String objetivo, @Param("duracionDias") int duracionDias, @Param("alimentos") ArrayList<String> alimentos, @Param("recomendaciones") String recomendaciones, @Param("entrenadorId") Long entrenadorId, @Param("clienteId") Set<Long> clienteId);
+    
+    @Modifying
+    @Transactional
+    @Query("UPDATE Dieta d SET d.nombre = :nombre, d.descripcion = :descripcion, d.observaciones = :observaciones, d.objetivo = :objetivo, d.duracionDias = :duracionDias, d.alimentos = :alimentos, d.recomendaciones = :recomendaciones, d.clienteId = :clienteId WHERE d.id = :id AND d.entrenadorId = :entrenadorId")
+    void updateDieta(@Param("nombre") String nombre, @Param("descripcion") String descripcion, @Param("observaciones") String observaciones, @Param("objetivo") String objetivo, @Param("duracionDias") int duracionDias, @Param("alimentos") ArrayList<String> alimentos, @Param("recomendaciones") String recomendaciones, @Param("entrenadorId") Long entrenadorId, @Param("clienteId") Set<Long> clienteId, @Param("id") Long id);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Dieta d SET d.clienteId = :clienteId WHERE d.id = :id AND d.entrenadorId = :entrenadorId")
+    void updateCliente(@Param("entrenadorId") Long entrenadorId, @Param("clienteId") Set<Long> clienteId, @Param("id") Long id);
+
+    @Modifying
+    @Transactional
     @Query("DELETE FROM Dieta d WHERE d.id = :id AND d.entrenadorId = :entrenadorId")
     void deleteByIdAndEntrenadorId(@Param("id") Long id, @Param("entrenadorId") Long entrenadorId);
     

@@ -25,44 +25,68 @@ public class DietaServicio {
 
     @Autowired
     public DietaServicio(DietaRepository dietaRepository){
+
         this.dietaRepo = dietaRepository;
+        
     }
 
     public List<Dieta> dietasDeEntrenador(Long idEntrenador) {
+
       return this.dietaRepo.findByEntrenadorId(idEntrenador);
+
    }
 
    public List<Dieta> dietasDeCliente(Long idCliente) {
+
       return this.dietaRepo.findByClienteId(idCliente);
+
    }
 
    public Dieta postDieta(Dieta dieta){
+
     return dietaRepo.save(dieta);
+
    }
 
    public Dieta actualizarDieta(Dieta dieta) {
+
       if (dietaRepo.existsById(dieta.getId())) {
+
           return dietaRepo.save(dieta);
+
       } else {
+
           throw new DietaNoExisteException("Dieta no encontrada");
+
       }
+
   }
   
    public Optional<Dieta> getDieta(Long id) {
+
       return this.dietaRepo.findById(id);
+
    }
 
    public void deleteDietaById(Long id) {
+
       if (dietaRepo.existsById(id)) {
+
          dietaRepo.deleteById(id);
+
      } else {
+
          throw new DietaNoExisteException("Dieta no encontrada");
+
      }
    }
 
+
    public Dieta putDieta(Long idDieta, DietaDTO nuevaDietaDTO, Long idCliente) {
+
         return dietaRepo.findById(idDieta)
             .map(dieta -> {
+
                 // Actualiza todos los campos de la dieta con los valores de nuevaDietaDTO
                 dieta.setNombre(nuevaDietaDTO.getNombre());
                 dieta.setDescripcion(nuevaDietaDTO.getDescripcion());
@@ -74,7 +98,9 @@ public class DietaServicio {
 
                 // Asocia el cliente a la dieta
                 if (dieta.getClienteId() == null) {
+
                     dieta.setClienteId(new HashSet<>());
+
                 }
                 dieta.getClienteId().add(idCliente);
 
@@ -83,6 +109,16 @@ public class DietaServicio {
             })
             .orElseThrow(() -> new DietaNoExisteException("Dieta no encontrada"));
     }
+
     
+    /*public boolean isEntrenadorOwner(Long idEntrenador, Dieta dieta){
+        
+        return dieta.getEntrenadorId() == idEntrenador;
+    }
+
+    public boolean isclienteOwner(Long idCliente, Dieta dieta){
+        return dieta.getClienteId().iterator().next() == idCliente;
+    }*/
+        
 
 }
