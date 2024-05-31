@@ -142,13 +142,10 @@ public class DietaRest {
     public ResponseEntity<DietaDTO> updateDieta(@PathVariable Long idDieta,
                                                 @RequestBody DietaDTO dietaDTO) {
         
-        //Optional<Dieta> g = servicio.getDieta(idDieta);
-        //Dieta g1 = g.get();
-
         Dieta dieta = Mapper.toDieta(dietaDTO);
-        //dieta.setClienteId(g1.getClienteId());
+        
         dieta.setId(idDieta);
-        //dieta.setEntrenadorId(idDieta);*/
+        
         Dieta actualizada = this.servicio.actualizarDieta(dieta);
         return ResponseEntity.ok(Mapper.toDietaDTO(actualizada));
     }
